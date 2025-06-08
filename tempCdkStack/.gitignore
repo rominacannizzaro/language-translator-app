@@ -36,3 +36,5 @@ Thumbs.db
 *.key
 *.crt
 
+# Ignore REST client test files
+test/restAPI.http
