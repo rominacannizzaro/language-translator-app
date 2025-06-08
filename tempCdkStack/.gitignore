@@ -1,0 +1,38 @@
+# CDK asset staging directory
+.cdk.staging/
+cdk.out/
+cdk.context.json
+
+# Node dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# TypeScript build artifacts
+dist/
+build/
+!jest.config.js
+*.js.map
+*.d.ts
+
+# Environment files
+.env
+.env.* 
+
+# IDE configs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# AWS credentials (just in case)
+*.pem
+*.key
+*.crt
+
