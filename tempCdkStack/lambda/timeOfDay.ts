@@ -30,9 +30,14 @@ export const index: lambda.APIGatewayProxyHandler = async function (
         const result = await translateClient.send(translateCmd);
         console.log(result);
 
+        const rtnData = {
+            timestamp: now,
+            text: result.TranslatedText,
+        }
+
         return {
             statusCode: 200,
-            body: result.TranslatedText,
+            body: JSON.stringify(rtnData),
         };
     } catch (e: any) {
         console.log(e);
