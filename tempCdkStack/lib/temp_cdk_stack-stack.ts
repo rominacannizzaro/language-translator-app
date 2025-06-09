@@ -18,7 +18,7 @@ export class TempCdkStackStack extends cdk.Stack {
 
     // timeOfDay lambda construct
     const lambdaFunc = new lambdaNodeJs.NodejsFunction(this, "timeOfDay", {
-      entry: "./lambda/timeOfDay.js",
+      entry: "./lambda/timeOfDay.ts",
       handler: "index",
       runtime: lambda.Runtime.NODEJS_20_X,
       initialPolicy: [translateAccessPolicy],
