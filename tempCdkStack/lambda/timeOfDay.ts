@@ -24,7 +24,11 @@ export async function index () {
             statusCode: 200,
             body: result.TranslatedText,
         };
-    } catch (e) {
+    } catch (e: any) {
         console.log(e);
+        return {
+            statusCode: 500,
+            body: e.toString(),
+        }
     };
 };
