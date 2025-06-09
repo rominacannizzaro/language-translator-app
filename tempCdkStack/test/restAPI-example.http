@@ -1,11 +1,11 @@
-# // REST API URL obtained from CDK deployment (API Gateway)
+# REST API URL obtained from CDK deployment (API Gateway)
 # Add the actual URL below and uncomment the line
 # @URL=https://your-api-id.execute-api.region.amazonaws.com/prod
 
-// Make Post call
+# Make Post call
 POST {{URL}} HTTP/1.1
 Content-Type: application/json
-Accept: "application/json"
+Accept: application/json
 
 {
 "sourceLang": "en",
