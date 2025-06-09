@@ -1,6 +1,6 @@
 # REST API URL obtained from CDK deployment (API Gateway)
-# Add the actual URL below and uncomment the line
-# @URL=https://your-api-id.execute-api.region.amazonaws.com/prod
+# Add the actual URL below
+@URL=https://your-api-id.execute-api.region.amazonaws.com/prod
 
 # Make Post call
 POST {{URL}} HTTP/1.1
