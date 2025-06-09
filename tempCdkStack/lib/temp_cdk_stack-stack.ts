@@ -26,6 +26,6 @@ export class TempCdkStackStack extends cdk.Stack {
 
     // create Rest Api
     const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI");
-    restApi.root.addMethod("GET", new apigateway.LambdaIntegration(lambdaFunc));
+    restApi.root.addMethod("POST", new apigateway.LambdaIntegration(lambdaFunc));
   }
 }
