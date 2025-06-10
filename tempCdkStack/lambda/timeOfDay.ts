@@ -37,13 +37,25 @@ export const index: lambda.APIGatewayProxyHandler = async function (
 
         return {
             statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*", // allows requests from any origin
+                "Access-Control-Allow-Credentials": true, // required for cookies, authorization headers, etc.
+                "Access-Control-Allow-Headers": "*", // allows all standard and custom headers
+                "Access-Control-Allow-Methods": "*", // allows all standard and custom headers
+            },
             body: JSON.stringify(rtnData),
         };
     } catch (e: any) {
         console.log(e);
         return {
             statusCode: 500,
-            body: e.toString(),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": true,
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*",
+            },
+            body: JSON.stringify(e.toString()),
         }
     };
 };
