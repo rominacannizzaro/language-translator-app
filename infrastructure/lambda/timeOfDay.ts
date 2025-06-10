@@ -17,7 +17,6 @@ export const index: lambda.APIGatewayProxyHandler = async function (
 
         // Get current time in human-readable format
         const now = new Date(Date.now()).toString();
-        console.log(now);
 
         // Create translation command
         const translateCmd = new clientTranslate.TranslateTextCommand({
@@ -28,7 +27,6 @@ export const index: lambda.APIGatewayProxyHandler = async function (
 
         // Send the command and wait for response
         const result = await translateClient.send(translateCmd);
-        console.log(result);
 
         const rtnData = {
             timestamp: now,
@@ -46,7 +44,6 @@ export const index: lambda.APIGatewayProxyHandler = async function (
             body: JSON.stringify(rtnData),
         };
     } catch (e: any) {
-        console.log(e);
         return {
             statusCode: 500,
             headers: {
