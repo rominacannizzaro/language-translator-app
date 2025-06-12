@@ -1,7 +1,11 @@
 import * as clientTranslate from "@aws-sdk/client-translate";
 import * as dynamodb from "@aws-sdk/client-dynamodb";
 import * as lambda from "aws-lambda";
-import { TranslateRequest, TranslateResponse } from "@translator/shared-types";
+import {
+  TranslateRequest,
+  TranslateResponse,
+  TranslateDbObject,
+} from "@translator/shared-types";
 
 const { TRANSLATION_TABLE_NAME, TRANSLATION_PARTITION_KEY } = process.env;
 console.log(
@@ -25,7 +29,8 @@ const translateClient = new clientTranslate.TranslateClient({});
 const dynamodbClient = new dynamodb.DynamoDBClient({});
 
 export const index: lambda.APIGatewayProxyHandler = async function (
-  event: lambda.APIGatewayProxyEvent
+  event: lambda.APIGatewayProxyEvent,
+  context: lambda.Context
 ) {
   try {
     if (!event.body) {
@@ -68,6 +73,14 @@ export const index: lambda.APIGatewayProxyHandler = async function (
     const rtnData: TranslateResponse = {
       timestamp: now,
       targetText: result.TranslatedText,
+    };
+
+    // Prepare to store the translation into the translation table
+    // tableObj is the object stored to the database
+    const tableObj: TranslateDbObject = {
+      requestId: context.awsRequestId, // requestId is the primary key. It must be unique per translation request. context.awsRequestId provides a unique id per lambda call.
+      ...body,
+      ...rtnData,
     };
 
     return {
