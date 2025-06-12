@@ -5,8 +5,8 @@
     "deploy": "cd infrastructure; cdk deploy"
   },
   "workspaces": [
-    "apps/*", 
+    "apps/*",
     "infrastructure",
-    "packages/*"
+    "packages/**"
   ]
 }
