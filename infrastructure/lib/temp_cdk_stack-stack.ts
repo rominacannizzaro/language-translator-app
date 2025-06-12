@@ -18,6 +18,17 @@ export class TempCdkStackStack extends cdk.Stack {
       resources: ["*"],
     });
 
+    // Create policy statement to grant permission to perform PutItem/Scan/GetItem/DeleteItem operations on DynamoDB resources
+    const translateTablePolicy = new iam.PolicyStatement({
+      actions: [
+        "dynamodb:PutItem",
+        "dynamodb:Scan",
+        "dynamodb:GetItem",
+        "dynamodb:DeleteItem",
+      ],
+      resources: ["*"],
+    });
+
     const monorepoRoot = path.join(__dirname, "../../");
 
     const translateLambdaPath = path.join(
@@ -44,7 +55,7 @@ export class TempCdkStackStack extends cdk.Stack {
       entry: translateLambdaPath,
       handler: "index",
       runtime: lambda.Runtime.NODEJS_20_X,
-      initialPolicy: [translateServicePolicy],
+      initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/ Amazon Translate and DynamoDB
       environment: {
         TRANSLATION_TABLE_NAME: table.tableName,
         TRANSLATION_PARTITION_KEY: "requestId",
@@ -55,7 +66,7 @@ export class TempCdkStackStack extends cdk.Stack {
     const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI");
 
     // grant read and write access to DynamoDB table
-    table.grantReadWriteData(lambdaFunc);
+    // table.grantReadWriteData(lambdaFunc);
 
     restApi.root.addMethod(
       "POST",
