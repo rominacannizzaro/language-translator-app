@@ -6,7 +6,7 @@ import { useState } from "react";
 const URL="https://your-api-id.execute-api.region.amazonaws.com/prod"
 
 // Function to make HTTP call to our server, make a translation request and receive it
-function translateText({
+export const translateText = async ({
   inputLang,
   outputLang,
   inputText
@@ -14,7 +14,7 @@ function translateText({
   inputLang: string;
   outputLang: string;
   inputText: string;
-}) {
+}) => {
   return fetch(URL, { 
     method: "POST",
     body: JSON.stringify(
