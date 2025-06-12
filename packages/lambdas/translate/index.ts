@@ -1,9 +1,28 @@
 import * as clientTranslate from "@aws-sdk/client-translate";
+import * as dynamodb from "@aws-sdk/client-dynamodb";
 import * as lambda from "aws-lambda";
 import { TranslateRequest, TranslateResponse } from "@translator/shared-types";
 
+const { TRANSLATION_TABLE_NAME, TRANSLATION_PARTITION_KEY } = process.env;
+console.log(
+  "TRANSLATION_TABLE_NAME, TRANSLATION_PARTITION_KEY",
+  TRANSLATION_TABLE_NAME,
+  TRANSLATION_PARTITION_KEY
+);
+
+if (!TRANSLATION_TABLE_NAME) {
+  throw new Error("TRANSLATION_TABLE_NAME is empty");
+}
+
+if (!TRANSLATION_PARTITION_KEY) {
+  throw new Error("TRANSLATION_PARTITION_KEY is empty");
+}
+
 // Initialize the AWS Translate client
 const translateClient = new clientTranslate.TranslateClient({});
+
+// Initialize the DynamoDB service client
+const dynamodbClient = new dynamodb.DynamoDBClient({});
 
 export const index: lambda.APIGatewayProxyHandler = async function (
   event: lambda.APIGatewayProxyEvent
@@ -45,6 +64,7 @@ export const index: lambda.APIGatewayProxyHandler = async function (
       throw new Error("translation is empty");
     }
 
+    // Object for the response
     const rtnData: TranslateResponse = {
       timestamp: now,
       targetText: result.TranslatedText,
