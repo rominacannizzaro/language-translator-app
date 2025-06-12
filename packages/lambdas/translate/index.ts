@@ -1,5 +1,6 @@
 import * as clientTranslate from "@aws-sdk/client-translate";
 import * as dynamodb from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import * as lambda from "aws-lambda";
 import {
   TranslateRequest,
@@ -82,6 +83,15 @@ export const index: lambda.APIGatewayProxyHandler = async function (
       ...body,
       ...rtnData,
     };
+
+    // Put Item Command Input
+    const tableInsertCommand: dynamodb.PutItemCommandInput = {
+      TableName: TRANSLATION_TABLE_NAME,
+      Item: marshall(tableObj), // marshall modifies the original tableObj to make it compatible to be inserted into DynamoDB
+    };
+
+    // Execute Put Item Command Input
+    await dynamodbClient.send(new dynamodb.PutItemCommand(tableInsertCommand));
 
     return {
       statusCode: 200,
