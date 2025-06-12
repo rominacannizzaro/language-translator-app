@@ -25,7 +25,7 @@ export const translateText = async ({
 
     const result = await fetch(`${URL}`, {
       method: "POST",
-      body: JSON.stringify({ request }),
+      body: JSON.stringify(request),
     });
 
     const rtnValue = (await result.json()) as TranslateResponse;
