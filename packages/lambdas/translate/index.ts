@@ -56,14 +56,14 @@ export const index: lambda.APIGatewayProxyHandler = async function (
     const now = new Date(Date.now()).toString();
 
     // Create translation command
-    const translateCmd = new clientTranslate.TranslateTextCommand({
+    const translateCommand = new clientTranslate.TranslateTextCommand({
       SourceLanguageCode: sourceLang,
       TargetLanguageCode: targetLang,
       Text: sourceText,
     });
 
     // Send the command and wait for response
-    const result = await translateClient.send(translateCmd);
+    const result = await translateClient.send(translateCommand);
 
     if (!result.TranslatedText) {
       throw new Error("translation is empty");
