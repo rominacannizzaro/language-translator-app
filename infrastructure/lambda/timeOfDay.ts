@@ -1,5 +1,6 @@
 import * as clientTranslate from "@aws-sdk/client-translate";
 import * as lambda from "aws-lambda";
+import {TranslateRequest, TranslateResponse } from "@translator/shared-types"
 
 // Initialize the AWS Translate client
 const translateClient = new clientTranslate.TranslateClient({});
@@ -11,9 +12,8 @@ export const index: lambda.APIGatewayProxyHandler = async function (
         if (!event.body){
             throw new Error("body is empty.")
         };
-
-        const body = JSON.parse(event.body);
-        const { sourceLang, targetLang, text } = body;
+        const body = JSON.parse(event.body) as TranslateRequest; // the translate object that comes in into the lambda
+        const { sourceLang, targetLang, sourceText } = body;
 
         // Get current time in human-readable format
         const now = new Date(Date.now()).toString();
@@ -22,15 +22,19 @@ export const index: lambda.APIGatewayProxyHandler = async function (
         const translateCmd = new clientTranslate.TranslateTextCommand({
             SourceLanguageCode: sourceLang,
             TargetLanguageCode: targetLang,
-            Text: text,
+            Text: sourceText,
         });
 
         // Send the command and wait for response
         const result = await translateClient.send(translateCmd);
 
-        const rtnData = {
+        if(!result.TranslatedText) {
+            throw new Error("translation is empty");
+        };
+
+        const rtnData: TranslateResponse = {
             timestamp: now,
-            text: result.TranslatedText,
+            targetText: result.TranslatedText,
         }
 
         return {
