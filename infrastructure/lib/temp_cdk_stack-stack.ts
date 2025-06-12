@@ -38,13 +38,17 @@ export class TempCdkStackStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // timeOfDay lambda construct
+    // Lambda function that performs translation
     const lambdaFunc = new lambdaNodeJs.NodejsFunction(this, "timeOfDay", {
       projectRoot: monorepoRoot,
       entry: translateLambdaPath,
       handler: "index",
       runtime: lambda.Runtime.NODEJS_20_X,
       initialPolicy: [translateAccessPolicy],
+      environment: {
+        TRANSLATION_TABLE_NAME: table.tableName,
+        TRANSLATION_PARTITION_KEY: "requestId",
+      },
     });
 
     // create Rest Api
