@@ -5,6 +5,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as lambdaNodeJs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as iam from "aws-cdk-lib/aws-iam";
+import * as dynamoDb from "aws-cdk-lib/aws-dynamodb";
 
 export class TempCdkStackStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -27,6 +28,16 @@ export class TempCdkStackStack extends cdk.Stack {
       "index.ts"
     );
 
+    // DynamoDB construct
+    const table = new dynamoDb.Table(this, "translations", {
+      tableName: "translation",
+      partitionKey: {
+        name: "requestId",
+        type: dynamoDb.AttributeType.STRING,
+      },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     // timeOfDay lambda construct
     const lambdaFunc = new lambdaNodeJs.NodejsFunction(this, "timeOfDay", {
       projectRoot: monorepoRoot,
@@ -38,6 +49,10 @@ export class TempCdkStackStack extends cdk.Stack {
 
     // create Rest Api
     const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI");
+
+    // grant read and write access to DynamoDB table
+    table.grantReadWriteData(lambdaFunc);
+
     restApi.root.addMethod(
       "POST",
       new apigateway.LambdaIntegration(lambdaFunc)
