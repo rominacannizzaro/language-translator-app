@@ -11,9 +11,9 @@ export class TempCdkStackStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create policy to allow to access the Amazon Translate's TranslateText API
+    // Create policy statement to allow to access the Amazon Translate's TranslateText API
     // to attached to the lambda
-    const translateAccessPolicy = new iam.PolicyStatement({
+    const translateServicePolicy = new iam.PolicyStatement({
       actions: ["translate:TranslateText"],
       resources: ["*"],
     });
@@ -44,7 +44,7 @@ export class TempCdkStackStack extends cdk.Stack {
       entry: translateLambdaPath,
       handler: "index",
       runtime: lambda.Runtime.NODEJS_20_X,
-      initialPolicy: [translateAccessPolicy],
+      initialPolicy: [translateServicePolicy],
       environment: {
         TRANSLATION_TABLE_NAME: table.tableName,
         TRANSLATION_PARTITION_KEY: "requestId",
