@@ -87,7 +87,7 @@ export const index: lambda.APIGatewayProxyHandler = async function (
     // Put Item Command Input
     const tableInsertCommand: dynamodb.PutItemCommandInput = {
       TableName: TRANSLATION_TABLE_NAME,
-      Item: marshall(tableObj), // marshall modifies the original tableObj to make it compatible to be inserted into DynamoDB
+      Item: marshall(tableObj), // marshall converts the original 'tableObj' into a format that is suitable to be stored into DynamoDB
     };
 
     // Execute Put Item Command Input
