@@ -49,6 +49,9 @@ export class TempCdkStackStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // Create top level Rest Api
+    const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI");
+
     // Lambda function that performs translation
     const lambdaFunc = new lambdaNodeJs.NodejsFunction(this, "timeOfDay", {
       projectRoot: monorepoRoot,
@@ -61,9 +64,6 @@ export class TempCdkStackStack extends cdk.Stack {
         TRANSLATION_PARTITION_KEY: "requestId",
       },
     });
-
-    // create Rest Api
-    const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI");
 
     // grant read and write access to DynamoDB table
     // table.grantReadWriteData(lambdaFunc);
