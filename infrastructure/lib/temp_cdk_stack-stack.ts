@@ -69,5 +69,27 @@ export class TempCdkStackStack extends cdk.Stack {
       "POST",
       new apigateway.LambdaIntegration(lambdaFunc)
     );
+
+    // Lambda function that get translations
+    const getTranslationsLambda = new lambdaNodeJs.NodejsFunction(
+      this,
+      "getTranslationsLambda",
+      {
+        projectRoot: monorepoRoot,
+        entry: translateLambdaPath,
+        handler: "getTranslations",
+        runtime: lambda.Runtime.NODEJS_20_X,
+        initialPolicy: [translateTablePolicy],
+        environment: {
+          TRANSLATION_TABLE_NAME: table.tableName,
+          TRANSLATION_PARTITION_KEY: "requestId",
+        },
+      }
+    );
+
+    restApi.root.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(getTranslationsLambda)
+    );
   }
 }
