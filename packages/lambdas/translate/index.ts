@@ -29,7 +29,7 @@ const translateClient = new clientTranslate.TranslateClient({});
 // Initialize the DynamoDB service client
 const dynamodbClient = new dynamodb.DynamoDBClient({});
 
-export const index: lambda.APIGatewayProxyHandler = async function (
+export const translate: lambda.APIGatewayProxyHandler = async function (
   event: lambda.APIGatewayProxyEvent,
   context: lambda.Context
 ) {
