@@ -53,21 +53,25 @@ export class TempCdkStackStack extends cdk.Stack {
     const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI");
 
     // Lambda function that performs translation
-    const lambdaFunc = new lambdaNodeJs.NodejsFunction(this, "timeOfDay", {
-      projectRoot: monorepoRoot,
-      entry: translateLambdaPath,
-      handler: "index",
-      runtime: lambda.Runtime.NODEJS_20_X,
-      initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
-      environment: {
-        TRANSLATION_TABLE_NAME: table.tableName,
-        TRANSLATION_PARTITION_KEY: "requestId",
-      },
-    });
+    const translateLambda = new lambdaNodeJs.NodejsFunction(
+      this,
+      "translateLambda",
+      {
+        projectRoot: monorepoRoot,
+        entry: translateLambdaPath,
+        handler: "index",
+        runtime: lambda.Runtime.NODEJS_20_X,
+        initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
+        environment: {
+          TRANSLATION_TABLE_NAME: table.tableName,
+          TRANSLATION_PARTITION_KEY: "requestId",
+        },
+      }
+    );
 
     restApi.root.addMethod(
       "POST",
-      new apigateway.LambdaIntegration(lambdaFunc)
+      new apigateway.LambdaIntegration(translateLambda)
     );
 
     // Lambda function that retrieves translations
