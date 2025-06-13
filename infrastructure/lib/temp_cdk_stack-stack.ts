@@ -65,9 +65,6 @@ export class TempCdkStackStack extends cdk.Stack {
       },
     });
 
-    // grant read and write access to DynamoDB table
-    // table.grantReadWriteData(lambdaFunc);
-
     restApi.root.addMethod(
       "POST",
       new apigateway.LambdaIntegration(lambdaFunc)
