@@ -1,10 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { TranslateRequest, TranslateResponse } from "@translator/shared-types";
+import {
+  TranslateDbObject,
+  TranslateRequest,
+  TranslateResponse,
+} from "@translator/shared-types";
 
 // API Gateway URL (add the actual URL below)
-const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
+// const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
 
 // Function to make HTTP call to our server, make a translation request and receive it
 export const translateText = async ({
@@ -30,6 +34,21 @@ export const translateText = async ({
 
     const rtnValue = (await result.json()) as TranslateResponse;
     return rtnValue;
+  } catch (e: any) {
+    console.error(e);
+    throw e;
+  }
+};
+
+export const getTranslations = async () => {
+  try {
+    const result = await fetch(URL, {
+      method: "GET",
+    });
+
+    const rtnValue = (await result.json()) as Array<TranslateDbObject>;
+    console.log(rtnValue);
+    // return rtnValue;
   } catch (e: any) {
     console.error(e);
     throw e;
@@ -93,6 +112,14 @@ export default function Home() {
       <pre className="whitespace-pre-wrap w-full">
         {JSON.stringify(outputText)}
       </pre>
+
+      <button
+        className="btn bg-blue-500 p-2 mt-2 rounded-xl"
+        type="button"
+        onClick={() => getTranslations()}
+      >
+        Get translations
+      </button>
     </main>
   );
 }
