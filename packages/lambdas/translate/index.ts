@@ -116,3 +116,49 @@ export const index: lambda.APIGatewayProxyHandler = async function (
     };
   }
 };
+
+// Function that returns translations
+export const getTranslations: lambda.APIGatewayProxyHandler = async function (
+  event: lambda.APIGatewayProxyEvent,
+  context: lambda.Context
+) {
+  try {
+    // Scan Command Input
+    const scanCommand: dynamodb.ScanCommandInput = {
+      TableName: TRANSLATION_TABLE_NAME,
+    };
+
+    // Execute Scan Command Input
+    // This variable is of type dynamo.ScanCommandOutput. The property needed from is 'Items'.
+    const { Items } = await dynamodbClient.send(
+      new dynamodb.ScanCommand(scanCommand)
+    );
+
+    if (!Items) {
+      throw new Error("no items found");
+    }
+
+    const rtnData = Items.map((item) => unmarshall(item) as TranslateDbObject);
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*", // allows requests from any origin
+        "Access-Control-Allow-Credentials": true, // required for cookies, authorization headers, etc.
+        "Access-Control-Allow-Headers": "*", // allows all standard and custom headers
+        "Access-Control-Allow-Methods": "*", // allows all standard and custom headers
+      },
+      body: JSON.stringify(rtnData),
+    };
+  } catch (e: any) {
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "*",
+      },
+      body: JSON.stringify(e.toString()),
+    };
+  }
+};
