@@ -70,7 +70,7 @@ export class TempCdkStackStack extends cdk.Stack {
       new apigateway.LambdaIntegration(lambdaFunc)
     );
 
-    // Lambda function that get translations
+    // Lambda function that retrieves translations
     const getTranslationsLambda = new lambdaNodeJs.NodejsFunction(
       this,
       "getTranslationsLambda",
