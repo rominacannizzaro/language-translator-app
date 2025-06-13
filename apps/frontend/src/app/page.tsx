@@ -63,63 +63,69 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <form
-        onSubmit={async (event) => {
-          event.preventDefault();
-          // console.log({inputText, inputLang, outputLang});
-          const result = await translateText({
-            inputText,
-            inputLang,
-            outputLang,
-          });
-          setOutputText(result);
-        }}
-      >
-        <div>
-          <label htmlFor="inputText">Input text</label>
-          <textarea
-            id="inputText"
-            className="bg-white"
-            value={inputText}
-            onChange={(event) => setInputText(event.target.value)}
-          />
-        </div>
+      <div>
+        <form
+          onSubmit={async (event) => {
+            event.preventDefault();
+            // console.log({inputText, inputLang, outputLang});
+            const result = await translateText({
+              inputText,
+              inputLang,
+              outputLang,
+            });
+            setOutputText(result);
+          }}
+        >
+          <div>
+            <label htmlFor="inputText">Input text</label>
+            <textarea
+              id="inputText"
+              className="bg-white"
+              value={inputText}
+              onChange={(event) => setInputText(event.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="inputLang">Input language</label>
+            <textarea
+              id="inputLang"
+              className="bg-white"
+              value={inputLang}
+              onChange={(event) => setInputLang(event.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="outputLang">Output language</label>
+            <textarea
+              id="outputLang"
+              className="bg-white"
+              value={outputLang}
+              onChange={(event) => setOutputLang(event.target.value)}
+            />
+          </div>
+
+          <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
+            Translate
+          </button>
+        </form>
 
         <div>
-          <label htmlFor="inputLang">Input language</label>
-          <textarea
-            id="inputLang"
-            className="bg-white"
-            value={inputLang}
-            onChange={(event) => setInputLang(event.target.value)}
-          />
+          <p>Result:</p>
+          <pre className="whitespace-pre-wrap w-full">
+            {JSON.stringify(outputText)}
+          </pre>
         </div>
 
-        <div>
-          <label htmlFor="outputLang">Output language</label>
-          <textarea
-            id="outputLang"
-            className="bg-white"
-            value={outputLang}
-            onChange={(event) => setOutputLang(event.target.value)}
-          />
-        </div>
-
-        <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
-          Translate
+        <button
+          className="btn bg-blue-500 p-2 mt-2 rounded-xl"
+          type="button"
+          onClick={() => getTranslations()}
+        >
+          Get translations
         </button>
-      </form>
-      <pre className="whitespace-pre-wrap w-full">
-        {JSON.stringify(outputText)}
-      </pre>
-
-      <button
-        className="btn bg-blue-500 p-2 mt-2 rounded-xl"
-        type="button"
-        onClick={() => getTranslations()}
-      >
-        Get translations
-      </button>
+      </div>
     </main>
   );
 }
