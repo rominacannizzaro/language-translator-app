@@ -47,8 +47,7 @@ export const getTranslations = async () => {
     });
 
     const rtnValue = (await result.json()) as Array<TranslateDbObject>;
-    console.log(rtnValue);
-    // return rtnValue;
+    return rtnValue;
   } catch (e: any) {
     console.error(e);
     throw e;
@@ -60,6 +59,9 @@ export default function Home() {
   const [inputLang, setInputLang] = useState<string>("");
   const [outputLang, setOutputLang] = useState<string>("");
   const [outputText, setOutputText] = useState<TranslateResponse | null>(null);
+  const [translations, setTranslations] = useState<Array<TranslateDbObject>>(
+    []
+  );
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -121,10 +123,29 @@ export default function Home() {
         <button
           className="btn bg-blue-500 p-2 mt-2 rounded-xl"
           type="button"
-          onClick={() => getTranslations()}
+          onClick={async () => {
+            const rtnValue = await getTranslations();
+            setTranslations(rtnValue);
+          }}
         >
           Get translations
         </button>
+
+        <div>
+          <p>Result:</p>
+          <pre>
+            {translations.map((item) => (
+              <div>
+                <p>
+                  {item.sourceLang} / {item.sourceText}
+                </p>
+                <p>
+                  {item.targetLang} / {item.targetText}
+                </p>
+              </div>
+            ))}
+          </pre>
+        </div>
       </div>
     </main>
   );
