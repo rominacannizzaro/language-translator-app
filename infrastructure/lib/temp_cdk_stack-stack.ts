@@ -59,7 +59,7 @@ export class TempCdkStackStack extends cdk.Stack {
       {
         projectRoot: monorepoRoot,
         entry: translateLambdaPath,
-        handler: "index",
+        handler: "translate",
         runtime: lambda.Runtime.NODEJS_20_X,
         initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
         environment: {
