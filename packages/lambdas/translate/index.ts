@@ -1,8 +1,7 @@
-import * as clientTranslate from "@aws-sdk/client-translate";
 import * as dynamodb from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import * as lambda from "aws-lambda";
-import { gateway } from "/opt/nodejs/utils-lambda-layer";
+import { gateway, getTranslation } from "/opt/nodejs/utils-lambda-layer";
 import {
   TranslateRequest,
   TranslateResponse,
@@ -23,9 +22,6 @@ if (!TRANSLATION_TABLE_NAME) {
 if (!TRANSLATION_PARTITION_KEY) {
   throw new Error("TRANSLATION_PARTITION_KEY is empty");
 }
-
-// Initialize the AWS Translate client
-const translateClient = new clientTranslate.TranslateClient({});
 
 // Initialize the DynamoDB service client
 const dynamodbClient = new dynamodb.DynamoDBClient({});
@@ -57,15 +53,8 @@ export const translate: lambda.APIGatewayProxyHandler = async function (
     // Get current time in human-readable format
     const now = new Date(Date.now()).toString();
 
-    // Create translation command
-    const translateCommand = new clientTranslate.TranslateTextCommand({
-      SourceLanguageCode: sourceLang,
-      TargetLanguageCode: targetLang,
-      Text: sourceText,
-    });
-
-    // Send the command and wait for response
-    const result = await translateClient.send(translateCommand);
+    // Wait for translation
+    const result = await getTranslation(body);
 
     if (!result.TranslatedText) {
       throw new Error("translation is empty");
