@@ -20,7 +20,7 @@
     "strictPropertyInitialization": false,
     "typeRoots": ["./node_modules/@types"],
     "paths": {
-      "/opt/nodejs/utils-lambda-layer": ["./lambda-layer/utils-lambda-layer"]
+      "/opt/nodejs/utils-lambda-layer": ["./lambda-layers/utils-lambda-layer"]
     }
   },
   "exclude": ["node_modules"]
