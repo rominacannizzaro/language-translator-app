@@ -29,6 +29,7 @@ export class TempCdkStackStack extends cdk.Stack {
       resources: ["*"],
     });
 
+    //Project paths
     const monorepoRoot = path.join(__dirname, "../../");
 
     const translateLambdaPath = path.join(
@@ -39,6 +40,12 @@ export class TempCdkStackStack extends cdk.Stack {
       "index.ts"
     );
 
+    const lambdaLayersDirPath = path.join(
+      monorepoRoot,
+      "packages",
+      "lambda-layers"
+    );
+
     // DynamoDB construct
     const table = new dynamoDb.Table(this, "translations", {
       tableName: "translation",
@@ -46,6 +53,18 @@ export class TempCdkStackStack extends cdk.Stack {
         name: "requestId",
         type: dynamoDb.AttributeType.STRING,
       },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    // Point to Lambda Layer
+    const utilsLambdaLayerPath = path.resolve(
+      path.join(lambdaLayersDirPath, "utils-lambda-layer")
+    );
+
+    // Lambda Layer construct
+    const utilsLambdaLayer = new lambda.LayerVersion(this, "utilsLambdaLayer", {
+      code: lambda.Code.fromAsset(utilsLambdaLayerPath),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
