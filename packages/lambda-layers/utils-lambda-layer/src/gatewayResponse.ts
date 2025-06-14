@@ -20,14 +20,14 @@ const createGatewayResponse = ({
 };
 
 export const createSuccessJsonResponse = (body: object) => {
-  createGatewayResponse({
+  return createGatewayResponse({
     statusCode: 200,
     body: JSON.stringify(body),
   });
 };
 
 export const createErrorJsonResponse = (body: object) => {
-  createGatewayResponse({
+  return createGatewayResponse({
     statusCode: 500,
     body: JSON.stringify(body),
   });
