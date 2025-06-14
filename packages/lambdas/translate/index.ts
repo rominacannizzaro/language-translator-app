@@ -1,10 +1,9 @@
-import * as dynamodb from "@aws-sdk/client-dynamodb";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import * as lambda from "aws-lambda";
 import {
   gateway,
   getTranslation,
   exception,
+  TranslationTable,
 } from "/opt/nodejs/utils-lambda-layer";
 import {
   TranslateRequest,
@@ -13,11 +12,6 @@ import {
 } from "@translator/shared-types";
 
 const { TRANSLATION_TABLE_NAME, TRANSLATION_PARTITION_KEY } = process.env;
-console.log(
-  "TRANSLATION_TABLE_NAME, TRANSLATION_PARTITION_KEY",
-  TRANSLATION_TABLE_NAME,
-  TRANSLATION_PARTITION_KEY
-);
 
 if (!TRANSLATION_TABLE_NAME) {
   throw new exception.MissingEnvironmentVariable("TRANSLATION_TABLE_NAME");
@@ -27,8 +21,11 @@ if (!TRANSLATION_PARTITION_KEY) {
   throw new exception.MissingEnvironmentVariable("TRANSLATION_PARTITION_KEY");
 }
 
-// Initialize the DynamoDB service client
-const dynamodbClient = new dynamodb.DynamoDBClient({});
+// Create instance of TranslationTable
+const translateTable = new TranslationTable({
+  tableName: TRANSLATION_TABLE_NAME,
+  partitionKey: TRANSLATION_PARTITION_KEY,
+});
 
 export const translate: lambda.APIGatewayProxyHandler = async function (
   event: lambda.APIGatewayProxyEvent,
@@ -75,14 +72,7 @@ export const translate: lambda.APIGatewayProxyHandler = async function (
       ...rtnData,
     };
 
-    // Put Item Command Input
-    const tableInsertCommand: dynamodb.PutItemCommandInput = {
-      TableName: TRANSLATION_TABLE_NAME,
-      Item: marshall(tableObj), // marshall converts the original 'tableObj' into a format that is suitable to be stored into DynamoDB
-    };
-
-    // Execute Put Item Command Input
-    await dynamodbClient.send(new dynamodb.PutItemCommand(tableInsertCommand));
+    await translateTable.insert(tableObj);
 
     return gateway.createSuccessJsonResponse(rtnData);
   } catch (e: any) {
@@ -97,22 +87,7 @@ export const getTranslations: lambda.APIGatewayProxyHandler = async function (
   context: lambda.Context
 ) {
   try {
-    // Scan Command Input
-    const scanCommand: dynamodb.ScanCommandInput = {
-      TableName: TRANSLATION_TABLE_NAME,
-    };
-
-    // Execute Scan Command Input
-    // This variable is of type dynamo.ScanCommandOutput. The property needed from is 'Items'.
-    const { Items } = await dynamodbClient.send(
-      new dynamodb.ScanCommand(scanCommand)
-    );
-
-    if (!Items) {
-      throw new exception.MissingParameters("Items");
-    }
-
-    const rtnData = Items.map((item) => unmarshall(item) as TranslateDbObject);
+    const rtnData = await translateTable.getAll();
     return gateway.createSuccessJsonResponse(rtnData);
   } catch (e: any) {
     return gateway.createErrorJsonResponse(e);
