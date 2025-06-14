@@ -81,6 +81,7 @@ export class TempCdkStackStack extends cdk.Stack {
         handler: "translate",
         runtime: lambda.Runtime.NODEJS_20_X,
         initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
+        layers: [utilsLambdaLayer],
         environment: {
           TRANSLATION_TABLE_NAME: table.tableName,
           TRANSLATION_PARTITION_KEY: "requestId",
@@ -103,6 +104,7 @@ export class TempCdkStackStack extends cdk.Stack {
         handler: "getTranslations",
         runtime: lambda.Runtime.NODEJS_20_X,
         initialPolicy: [translateTablePolicy],
+        layers: [utilsLambdaLayer],
         environment: {
           TRANSLATION_TABLE_NAME: table.tableName,
           TRANSLATION_PARTITION_KEY: "requestId",
