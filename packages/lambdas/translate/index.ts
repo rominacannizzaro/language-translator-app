@@ -2,6 +2,7 @@ import * as clientTranslate from "@aws-sdk/client-translate";
 import * as dynamodb from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import * as lambda from "aws-lambda";
+import { gateway } from "/opt/nodejs/utils-lambda-layer";
 import {
   TranslateRequest,
   TranslateResponse,
@@ -93,27 +94,10 @@ export const translate: lambda.APIGatewayProxyHandler = async function (
     // Execute Put Item Command Input
     await dynamodbClient.send(new dynamodb.PutItemCommand(tableInsertCommand));
 
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*", // allows requests from any origin
-        "Access-Control-Allow-Credentials": true, // required for cookies, authorization headers, etc.
-        "Access-Control-Allow-Headers": "*", // allows all standard and custom headers
-        "Access-Control-Allow-Methods": "*", // allows all standard and custom headers
-      },
-      body: JSON.stringify(rtnData),
-    };
+    return gateway.createSuccessJsonResponse(rtnData);
   } catch (e: any) {
-    return {
-      statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Methods": "*",
-      },
-      body: JSON.stringify(e.toString()),
-    };
+    console.error(e);
+    return gateway.createErrorJsonResponse(e);
   }
 };
 
@@ -139,26 +123,8 @@ export const getTranslations: lambda.APIGatewayProxyHandler = async function (
     }
 
     const rtnData = Items.map((item) => unmarshall(item) as TranslateDbObject);
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*", // allows requests from any origin
-        "Access-Control-Allow-Credentials": true, // required for cookies, authorization headers, etc.
-        "Access-Control-Allow-Headers": "*", // allows all standard and custom headers
-        "Access-Control-Allow-Methods": "*", // allows all standard and custom headers
-      },
-      body: JSON.stringify(rtnData),
-    };
+    return gateway.createSuccessJsonResponse(rtnData);
   } catch (e: any) {
-    return {
-      statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Methods": "*",
-      },
-      body: JSON.stringify(e.toString()),
-    };
+    return gateway.createErrorJsonResponse(e);
   }
 };
