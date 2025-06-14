@@ -18,7 +18,6 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "typeRoots": ["./node_modules/@types"],
     "paths": {
       "/opt/nodejs/utils-lambda-layer": ["./lambda-layers/utils-lambda-layer"]
     }
