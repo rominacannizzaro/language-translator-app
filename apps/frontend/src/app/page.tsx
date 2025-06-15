@@ -11,7 +11,7 @@ import {
 // const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
 
 // Function to make HTTP call to our server, make a translation request and receive it
-export const translateText = async ({
+const translateText = async ({
   inputLang,
   outputLang,
   inputText,
@@ -34,13 +34,13 @@ export const translateText = async ({
 
     const rtnValue = (await result.json()) as TranslateResponse;
     return rtnValue;
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error(e);
     throw e;
   }
 };
 
-export const getTranslations = async () => {
+const getTranslations = async () => {
   try {
     const result = await fetch(URL, {
       method: "GET",
@@ -48,7 +48,7 @@ export const getTranslations = async () => {
 
     const rtnValue = (await result.json()) as Array<TranslateDbObject>;
     return rtnValue;
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error(e);
     throw e;
   }
