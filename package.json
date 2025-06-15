@@ -2,6 +2,7 @@
   "name": "language-translator-app",
   "scripts": {
     "frontend-dev": "npm run dev --workspace=@translator/frontend",
+    "frontend:build": "npm run build --workspace=@translator/frontend",
     "deploy": "cd infrastructure; cdk deploy",
     "build-utils-lambda-layer": "npm run build --workspace @translator/utils-lambda-layer",
     "watch-utils-lambda-layer": "npm run watch --workspace @translator/utils-lambda-layer"
