@@ -135,7 +135,7 @@ export default function Home() {
           <p>Result:</p>
           <pre>
             {translations.map((item) => (
-              <div>
+              <div key={item.requestId}>
                 <p>
                   {item.sourceLang} / {item.sourceText}
                 </p>
