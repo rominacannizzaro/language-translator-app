@@ -8,6 +8,9 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as dynamoDb from "aws-cdk-lib/aws-dynamodb";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
+import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
+
 export class TempCdkStackStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -134,10 +137,25 @@ export class TempCdkStackStack extends cdk.Stack {
       autoDeleteObjects: true, // delete all objects automatically when the bucket is deleted
     });
 
+    // Create CloudFront distribution to serve the website files from the S3 bucket
+    const distro = new cloudfront.Distribution(this, "WebsiteCloudfrontDist", {
+      defaultBehavior: {
+        origin: new S3Origin(bucket),
+      },
+    });
+
     // s3 construct to deploy the website dist content
     new s3deploy.BucketDeployment(this, "WebsiteDeploy", {
       destinationBucket: bucket,
       sources: [s3deploy.Source.asset("../apps/frontend/dist")],
+      distribution: distro,
+      distributionPaths: ["/*"],
+    });
+
+    // Output CloudFront distribution domain URL for easy access to the deployed website
+    new cdk.CfnOutput(this, "webUrl", {
+      exportName: "webUrl",
+      value: `https://${distro.distributionDomainName}`,
     });
   }
 }
