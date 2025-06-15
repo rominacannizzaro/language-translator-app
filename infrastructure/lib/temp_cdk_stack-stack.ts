@@ -6,7 +6,8 @@ import * as lambdaNodeJs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as dynamoDb from "aws-cdk-lib/aws-dynamodb";
-
+import * as s3 from "aws-cdk-lib/aws-s3";
+import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 export class TempCdkStackStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -116,5 +117,27 @@ export class TempCdkStackStack extends cdk.Stack {
       "GET",
       new apigateway.LambdaIntegration(getTranslationsLambda)
     );
+
+    // s3 bucket where webiste dist will reside
+    const bucket = new s3.Bucket(this, "WebsiteBucket", {
+      websiteIndexDocument: "index.html", // default page to serve when a user accesses the root of the site
+      websiteErrorDocument: "404.html", // page to serve when a 404 (not found) error occurs
+      publicReadAccess: true, // allow public read access to all objects in the bucket
+      // blockPublicAccess settings to make the bucket public (since the default blocks public access)
+      blockPublicAccess: {
+        blockPublicAcls: false, // allow ACLs (Access Control Lists) to be set publicly
+        blockPublicPolicy: false, // allow bucket policies that make the bucket public
+        ignorePublicAcls: false, // allow ACLs to take effect (do not ignore them)
+        restrictPublicBuckets: false, // allow the bucket to be publicly accessible
+      },
+      removalPolicy: cdk.RemovalPolicy.DESTROY, // delete bucket automatically when the stack is destroyed
+      autoDeleteObjects: true, // delete all objects automatically when the bucket is deleted
+    });
+
+    // s3 construct to deploy the website dist content
+    new s3deploy.BucketDeployment(this, "WebsiteDeploy", {
+      destinationBucket: bucket,
+      sources: [s3deploy.Source.asset("../apps/frontend/dist")],
+    });
   }
 }
