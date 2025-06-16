@@ -9,7 +9,10 @@ import * as dynamoDb from "aws-cdk-lib/aws-dynamodb";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
-import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
+import { S3StaticWebsiteOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
+import * as route53 from "aws-cdk-lib/aws-route53";
+import * as route53Targets from "aws-cdk-lib/aws-route53-targets";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
 
 export class TempCdkStackStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -49,6 +52,9 @@ export class TempCdkStackStack extends cdk.Stack {
       "packages",
       "lambda-layers"
     );
+
+    const domain = "yourDomain"; // add your own domain (e.g.: mydomain.com)
+    const fullUrl = `www.${domain}`;
 
     // DynamoDB construct
     const table = new dynamoDb.Table(this, "translations", {
@@ -121,6 +127,18 @@ export class TempCdkStackStack extends cdk.Stack {
       new apigateway.LambdaIntegration(getTranslationsLambda)
     );
 
+    // Fetch Route53 hosted zone by domain name
+    const zone = route53.HostedZone.fromLookup(this, "zone", {
+      domainName: domain,
+    });
+
+    // Create an ACM certificate for the domain and www subdomain with DNS validation in Route 53
+    const certificate = new acm.Certificate(this, "certificate", {
+      domainName: domain,
+      subjectAlternativeNames: [fullUrl],
+      validation: acm.CertificateValidation.fromDns(zone), // Automatically creates the DNS records in Route 53 hosted zone (DNS validation)
+    });
+
     // s3 bucket where webiste dist will reside
     const bucket = new s3.Bucket(this, "WebsiteBucket", {
       websiteIndexDocument: "index.html", // default page to serve when a user accesses the root of the site
@@ -140,8 +158,10 @@ export class TempCdkStackStack extends cdk.Stack {
     // Create CloudFront distribution to serve the website files from the S3 bucket
     const distro = new cloudfront.Distribution(this, "WebsiteCloudfrontDist", {
       defaultBehavior: {
-        origin: new S3Origin(bucket),
+        origin: new S3StaticWebsiteOrigin(bucket),
       },
+      certificate: certificate, // Attach the ACM certificate to CloudFront to enable HTTPS for the custom domain names
+      domainNames: [domain, fullUrl],
     });
 
     // s3 construct to deploy the website dist content
@@ -150,6 +170,23 @@ export class TempCdkStackStack extends cdk.Stack {
       sources: [s3deploy.Source.asset("../apps/frontend/dist")],
       distribution: distro,
       distributionPaths: ["/*"],
+    });
+
+    // Create two Route 53 A records for the domain and full URL to route traffic to the CloudFront distribution
+    new route53.ARecord(this, "route53Domain", {
+      zone,
+      recordName: domain,
+      target: route53.RecordTarget.fromAlias(
+        new route53Targets.CloudFrontTarget(distro)
+      ),
+    });
+
+    new route53.ARecord(this, "route53FullUrl", {
+      zone,
+      recordName: fullUrl,
+      target: route53.RecordTarget.fromAlias(
+        new route53Targets.CloudFrontTarget(distro)
+      ),
     });
 
     // Output CloudFront distribution domain URL for easy access to the deployed website
