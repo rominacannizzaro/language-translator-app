@@ -1,10 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as path from "path";
 import { Construct } from "constructs";
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as lambdaNodeJs from "aws-cdk-lib/aws-lambda-nodejs";
-import * as iam from "aws-cdk-lib/aws-iam";
-import * as dynamoDb from "aws-cdk-lib/aws-dynamodb";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
@@ -12,40 +8,14 @@ import { S3StaticWebsiteOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 import * as route53 from "aws-cdk-lib/aws-route53";
 import * as route53Targets from "aws-cdk-lib/aws-route53-targets";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
-import { RestApiService } from "../constructs";
+import { RestApiService, TranslationService } from "../constructs";
 
 export class TranslatorServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create policy statement to allow to access the Amazon Translate's TranslateText API
-    // to attached to the lambda
-    const translateServicePolicy = new iam.PolicyStatement({
-      actions: ["translate:TranslateText"],
-      resources: ["*"],
-    });
-
-    // Create policy statement to grant permission to perform PutItem/Scan/GetItem/DeleteItem operations on DynamoDB resources
-    const translateTablePolicy = new iam.PolicyStatement({
-      actions: [
-        "dynamodb:PutItem",
-        "dynamodb:Scan",
-        "dynamodb:GetItem",
-        "dynamodb:DeleteItem",
-      ],
-      resources: ["*"],
-    });
-
     //Project paths
-    const monorepoRoot = path.join(__dirname, "../../");
-
-    const translateLambdaPath = path.join(
-      monorepoRoot,
-      "packages",
-      "lambdas",
-      "translate",
-      "index.ts"
-    );
+    const monorepoRoot = path.join(__dirname, "../..", "../");
 
     const lambdaLayersDirPath = path.join(
       monorepoRoot,
@@ -69,79 +39,21 @@ export class TranslatorServiceStack extends cdk.Stack {
       validation: acm.CertificateValidation.fromDns(zone), // Automatically creates the DNS records in Route 53 hosted zone (DNS validation)
     });
 
-    const restAPi = new RestApiService(this, "restApiService", {
+    const restApi = new RestApiService(this, "restApiService", {
       apiUrl,
       certificate,
       zone,
     });
 
-    // DynamoDB construct
-    const table = new dynamoDb.Table(this, "translations", {
-      tableName: "translation",
-      partitionKey: {
-        name: "requestId",
-        type: dynamoDb.AttributeType.STRING,
-      },
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
-
-    // Point to Lambda Layer
-    const utilsLambdaLayerPath = path.resolve(
-      path.join(lambdaLayersDirPath, "utils-lambda-layer")
-    );
-
-    // Lambda Layer construct
-    const utilsLambdaLayer = new lambda.LayerVersion(this, "utilsLambdaLayer", {
-      code: lambda.Code.fromAsset(utilsLambdaLayerPath),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
-
-    // Lambda function that performs translation
-    const translateLambda = new lambdaNodeJs.NodejsFunction(
+    const translateService = new TranslationService(
       this,
-      "translateLambda",
+      "translationService",
       {
-        projectRoot: monorepoRoot,
-        entry: translateLambdaPath,
-        handler: "translate",
-        runtime: lambda.Runtime.NODEJS_20_X,
-        initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
-        layers: [utilsLambdaLayer],
-        environment: {
-          TRANSLATION_TABLE_NAME: table.tableName,
-          TRANSLATION_PARTITION_KEY: "requestId",
-        },
+        monorepoRoot,
+        lambdaLayersDirPath,
+        restApi,
       }
     );
-
-    restAPi.addTranslateMethod({
-      httpMethod: "POST",
-      lambda: translateLambda,
-    });
-
-    // Lambda function that retrieves translations
-    const getTranslationsLambda = new lambdaNodeJs.NodejsFunction(
-      this,
-      "getTranslationsLambda",
-      {
-        projectRoot: monorepoRoot,
-        entry: translateLambdaPath,
-        handler: "getTranslations",
-        runtime: lambda.Runtime.NODEJS_20_X,
-        initialPolicy: [translateTablePolicy],
-        layers: [utilsLambdaLayer],
-        environment: {
-          TRANSLATION_TABLE_NAME: table.tableName,
-          TRANSLATION_PARTITION_KEY: "requestId",
-        },
-      }
-    );
-
-    restAPi.addTranslateMethod({
-      httpMethod: "GET",
-      lambda: getTranslationsLambda,
-    });
 
     // s3 bucket where webiste dist will reside
     const bucket = new s3.Bucket(this, "WebsiteBucket", {
