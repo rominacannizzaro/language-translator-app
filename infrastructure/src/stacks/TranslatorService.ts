@@ -3,7 +3,6 @@ import * as path from "path";
 import { Construct } from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as lambdaNodeJs from "aws-cdk-lib/aws-lambda-nodejs";
-import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as dynamoDb from "aws-cdk-lib/aws-dynamodb";
 import * as s3 from "aws-cdk-lib/aws-s3";
@@ -13,6 +12,7 @@ import { S3StaticWebsiteOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 import * as route53 from "aws-cdk-lib/aws-route53";
 import * as route53Targets from "aws-cdk-lib/aws-route53-targets";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
+import { RestApiService } from "../constructs";
 
 export class TranslatorService extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -69,6 +69,12 @@ export class TranslatorService extends cdk.Stack {
       validation: acm.CertificateValidation.fromDns(zone), // Automatically creates the DNS records in Route 53 hosted zone (DNS validation)
     });
 
+    const restAPi = new RestApiService(this, "restApiService", {
+      apiUrl,
+      certificate,
+      zone,
+    });
+
     // DynamoDB construct
     const table = new dynamoDb.Table(this, "translations", {
       tableName: "translation",
@@ -91,15 +97,6 @@ export class TranslatorService extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // Create top level Rest Api
-    const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI", {
-      // Associate apiUrl domain name and the certificate with this Rest api
-      domainName: {
-        domainName: apiUrl,
-        certificate,
-      },
-    });
-
     // Lambda function that performs translation
     const translateLambda = new lambdaNodeJs.NodejsFunction(
       this,
@@ -118,10 +115,10 @@ export class TranslatorService extends cdk.Stack {
       }
     );
 
-    restApi.root.addMethod(
-      "POST",
-      new apigateway.LambdaIntegration(translateLambda)
-    );
+    restAPi.addTranslateMethod({
+      httpMethod: "POST",
+      lambda: translateLambda,
+    });
 
     // Lambda function that retrieves translations
     const getTranslationsLambda = new lambdaNodeJs.NodejsFunction(
@@ -141,10 +138,10 @@ export class TranslatorService extends cdk.Stack {
       }
     );
 
-    restApi.root.addMethod(
-      "GET",
-      new apigateway.LambdaIntegration(getTranslationsLambda)
-    );
+    restAPi.addTranslateMethod({
+      httpMethod: "GET",
+      lambda: getTranslationsLambda,
+    });
 
     // s3 bucket where webiste dist will reside
     const bucket = new s3.Bucket(this, "WebsiteBucket", {
@@ -193,15 +190,6 @@ export class TranslatorService extends cdk.Stack {
       recordName: "www",
       target: route53.RecordTarget.fromAlias(
         new route53Targets.CloudFrontTarget(distro)
-      ),
-    });
-
-    // Create Route 53 A record for the the rest api
-    new route53.ARecord(this, "apiDns", {
-      zone,
-      recordName: "api",
-      target: route53.RecordTarget.fromAlias(
-        new route53Targets.ApiGateway(restApi)
       ),
     });
 
