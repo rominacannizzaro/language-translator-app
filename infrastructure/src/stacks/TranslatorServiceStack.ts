@@ -104,11 +104,5 @@ export class TranslatorServiceStack extends cdk.Stack {
         new route53Targets.CloudFrontTarget(distro)
       ),
     });
-
-    // Output CloudFront distribution domain URL for easy access to the deployed website
-    new cdk.CfnOutput(this, "webUrl", {
-      exportName: "webUrl",
-      value: `https://${distro.distributionDomainName}`,
-    });
   }
 }
