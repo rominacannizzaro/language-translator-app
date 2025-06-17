@@ -55,6 +55,19 @@ export class TempCdkStackStack extends cdk.Stack {
 
     const domain = "yourDomain"; // add your own domain (e.g.: mydomain.com)
     const fullUrl = `www.${domain}`;
+    const apiUrl = `api.${domain}`; // custom url for the API Gateway
+
+    // Fetch Route53 hosted zone by domain name
+    const zone = route53.HostedZone.fromLookup(this, "zone", {
+      domainName: domain,
+    });
+
+    // Create an ACM certificate for the domain and www subdomain with DNS validation in Route 53
+    const certificate = new acm.Certificate(this, "certificate", {
+      domainName: domain,
+      subjectAlternativeNames: [fullUrl, apiUrl],
+      validation: acm.CertificateValidation.fromDns(zone), // Automatically creates the DNS records in Route 53 hosted zone (DNS validation)
+    });
 
     // DynamoDB construct
     const table = new dynamoDb.Table(this, "translations", {
@@ -79,7 +92,13 @@ export class TempCdkStackStack extends cdk.Stack {
     });
 
     // Create top level Rest Api
-    const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI");
+    const restApi = new apigateway.RestApi(this, "timeOfDayRestAPI", {
+      // Associate apiUrl domain name and the certificate with this Rest api
+      domainName: {
+        domainName: apiUrl,
+        certificate,
+      },
+    });
 
     // Lambda function that performs translation
     const translateLambda = new lambdaNodeJs.NodejsFunction(
@@ -127,18 +146,6 @@ export class TempCdkStackStack extends cdk.Stack {
       new apigateway.LambdaIntegration(getTranslationsLambda)
     );
 
-    // Fetch Route53 hosted zone by domain name
-    const zone = route53.HostedZone.fromLookup(this, "zone", {
-      domainName: domain,
-    });
-
-    // Create an ACM certificate for the domain and www subdomain with DNS validation in Route 53
-    const certificate = new acm.Certificate(this, "certificate", {
-      domainName: domain,
-      subjectAlternativeNames: [fullUrl],
-      validation: acm.CertificateValidation.fromDns(zone), // Automatically creates the DNS records in Route 53 hosted zone (DNS validation)
-    });
-
     // s3 bucket where webiste dist will reside
     const bucket = new s3.Bucket(this, "WebsiteBucket", {
       websiteIndexDocument: "index.html", // default page to serve when a user accesses the root of the site
@@ -183,9 +190,18 @@ export class TempCdkStackStack extends cdk.Stack {
 
     new route53.ARecord(this, "route53FullUrl", {
       zone,
-      recordName: fullUrl,
+      recordName: "www",
       target: route53.RecordTarget.fromAlias(
         new route53Targets.CloudFrontTarget(distro)
+      ),
+    });
+
+    // Create Route 53 A record for the the rest api
+    new route53.ARecord(this, "apiDns", {
+      zone,
+      recordName: "api",
+      target: route53.RecordTarget.fromAlias(
+        new route53Targets.ApiGateway(restApi)
       ),
     });
 
