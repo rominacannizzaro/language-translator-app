@@ -53,7 +53,7 @@ export class TempCdkStackStack extends cdk.Stack {
       "lambda-layers"
     );
 
-    const domain = "yourDomain"; // add your own domain (e.g.: mydomain.com)
+    const domain = "yourDomain.com"; // add your own domain (e.g.: mydomain.com)
     const fullUrl = `www.${domain}`;
     const apiUrl = `api.${domain}`; // custom url for the API Gateway
 
