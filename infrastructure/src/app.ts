@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
-import { TempCdkStackStack } from "./temp_cdk_stack-stack";
+import { TranslatorService } from "./stacks/TranslatorService";
 
 const app = new cdk.App();
-new TempCdkStackStack(app, "TempCdkStackStack", {
+new TranslatorService(app, "TranslatorService", {
   // Account and Region to deploy the stack to.
   env: {
     account: "yourAccountId",
