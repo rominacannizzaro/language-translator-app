@@ -7,6 +7,9 @@ import {
   StaticWebsiteDeployment,
   CertificateWrapper,
 } from "../constructs";
+import { getConfig } from "../helpers";
+
+const config = getConfig();
 
 export class TranslatorServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -21,9 +24,9 @@ export class TranslatorServiceStack extends cdk.Stack {
       "lambda-layers"
     );
 
-    const domain = "yourDomain.com"; // add your own domain (e.g.: mydomain.com)
-    const webUrl = `www.${domain}`;
-    const apiUrl = `api.${domain}`; // custom url for the API Gateway
+    const domain = config.domain; // add your own domain (e.g.: mydomain.com)
+    const webUrl = `${config.webSubdomain}.${domain}`;
+    const apiUrl = `${config.apiSubdomain}.${domain}`; // custom url for the API Gateway
 
     const certWrapper = new CertificateWrapper(this, "certificateWrapper", {
       domain,
