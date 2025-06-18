@@ -11,7 +11,7 @@ import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 
 export interface StaticWebsiteDeploymentProps extends cdk.StackProps {
   domain: string;
-  fullUrl: string;
+  webUrl: string;
   certificate: acm.Certificate;
   zone: route53.IHostedZone;
 }
@@ -21,7 +21,7 @@ export class StaticWebsiteDeployment extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { domain, fullUrl, certificate, zone }: StaticWebsiteDeploymentProps
+    { domain, webUrl, certificate, zone }: StaticWebsiteDeploymentProps
   ) {
     super(scope, id);
 
@@ -47,7 +47,7 @@ export class StaticWebsiteDeployment extends Construct {
         origin: new S3StaticWebsiteOrigin(bucket),
       },
       certificate: certificate, // Attach the ACM certificate to CloudFront to enable HTTPS for the custom domain names
-      domainNames: [domain, fullUrl],
+      domainNames: [domain, webUrl],
     });
 
     // s3 construct to deploy the website dist content

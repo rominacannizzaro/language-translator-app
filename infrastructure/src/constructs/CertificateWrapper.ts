@@ -5,7 +5,7 @@ import * as acm from "aws-cdk-lib/aws-certificatemanager";
 
 export interface CertificateWrapperProps extends cdk.StackProps {
   domain: string;
-  fullUrl: string;
+  webUrl: string;
   apiUrl: string;
 }
 
@@ -16,7 +16,7 @@ export class CertificateWrapper extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { domain, fullUrl, apiUrl }: CertificateWrapperProps
+    { domain, webUrl, apiUrl }: CertificateWrapperProps
   ) {
     super(scope, id);
 
@@ -28,7 +28,7 @@ export class CertificateWrapper extends Construct {
     // Create an ACM certificate for the domain and www subdomain with DNS validation in Route 53
     this.certificate = new acm.Certificate(this, "certificate", {
       domainName: domain,
-      subjectAlternativeNames: [fullUrl, apiUrl],
+      subjectAlternativeNames: [webUrl, apiUrl],
       validation: acm.CertificateValidation.fromDns(this.zone), // Automatically creates the DNS records in Route 53 hosted zone (DNS validation)
     });
   }

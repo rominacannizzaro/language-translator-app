@@ -22,13 +22,13 @@ export class TranslatorServiceStack extends cdk.Stack {
     );
 
     const domain = "yourDomain.com"; // add your own domain (e.g.: mydomain.com)
-    const fullUrl = `www.${domain}`;
+    const webUrl = `www.${domain}`;
     const apiUrl = `api.${domain}`; // custom url for the API Gateway
 
     const certWrapper = new CertificateWrapper(this, "certificateWrapper", {
       domain,
       apiUrl,
-      fullUrl,
+      webUrl,
     });
 
     const restApi = new RestApiService(this, "restApiService", {
@@ -45,7 +45,7 @@ export class TranslatorServiceStack extends cdk.Stack {
 
     new StaticWebsiteDeployment(this, "staticWebsiteDeployment", {
       domain,
-      fullUrl,
+      webUrl,
       certificate: certWrapper.certificate,
       zone: certWrapper.zone,
     });
