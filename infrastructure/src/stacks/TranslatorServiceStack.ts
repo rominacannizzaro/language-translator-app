@@ -16,12 +16,11 @@ export class TranslatorServiceStack extends cdk.Stack {
     super(scope, id, props);
 
     //Project paths
-    const monorepoRoot = path.join(__dirname, "../..", "../");
-
+    const projectRoot = "../";
+    const lambdasDirPath = path.join(projectRoot, "packages/lambdas");
     const lambdaLayersDirPath = path.join(
-      monorepoRoot,
-      "packages",
-      "lambda-layers"
+      projectRoot,
+      "packages/lambda-layers"
     );
 
     const domain = config.domain; // add your own domain (e.g.: mydomain.com)
@@ -41,8 +40,8 @@ export class TranslatorServiceStack extends cdk.Stack {
     });
 
     new TranslationService(this, "translationService", {
-      monorepoRoot,
       lambdaLayersDirPath,
+      lambdasDirPath,
       restApi,
     });
 

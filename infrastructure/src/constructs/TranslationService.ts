@@ -9,7 +9,7 @@ import * as lambdaNodeJs from "aws-cdk-lib/aws-lambda-nodejs";
 import { RestApiService } from "./RestApiService";
 
 export interface TranslationServiceProps extends cdk.StackProps {
-  monorepoRoot: string;
+  lambdasDirPath: string;
   lambdaLayersDirPath: string;
   restApi: RestApiService;
 }
@@ -19,16 +19,12 @@ export class TranslationService extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    { monorepoRoot, lambdaLayersDirPath, restApi }: TranslationServiceProps
+    { lambdasDirPath, lambdaLayersDirPath, restApi }: TranslationServiceProps
   ) {
     super(scope, id);
 
-    const translateLambdaPath = path.join(
-      monorepoRoot,
-      "packages",
-      "lambdas",
-      "translate",
-      "index.ts"
+    const translateLambdaPath = path.resolve(
+      path.join(lambdasDirPath, "translate/index.ts")
     );
 
     // Point to Lambda Layer
@@ -76,7 +72,6 @@ export class TranslationService extends Construct {
       this,
       "translateLambda",
       {
-        projectRoot: monorepoRoot,
         entry: translateLambdaPath,
         handler: "translate",
         runtime: lambda.Runtime.NODEJS_20_X,
@@ -100,7 +95,6 @@ export class TranslationService extends Construct {
       this,
       "getTranslationsLambda",
       {
-        projectRoot: monorepoRoot,
         entry: translateLambdaPath,
         handler: "getTranslations",
         runtime: lambda.Runtime.NODEJS_20_X,
