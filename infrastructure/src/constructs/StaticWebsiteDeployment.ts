@@ -8,6 +8,7 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 import { S3StaticWebsiteOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
+import { frontendDistPath } from "../helpers";
 
 export interface StaticWebsiteDeploymentProps extends cdk.StackProps {
   domain: string;
@@ -53,7 +54,7 @@ export class StaticWebsiteDeployment extends Construct {
     // s3 construct to deploy the website dist content
     new s3deploy.BucketDeployment(this, "WebsiteDeploy", {
       destinationBucket: bucket,
-      sources: [s3deploy.Source.asset("../apps/frontend/dist")],
+      sources: [s3deploy.Source.asset(frontendDistPath)],
       distribution: distro,
       distributionPaths: ["/*"],
     });
