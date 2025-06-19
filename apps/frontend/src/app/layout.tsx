@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ConfigureAmplify } from "@/components";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ConfigureAmplify />
         <div className="flex gap-2 px-4 py-2 bg-orange-400">
           <Link href="/">Home</Link>
           <Link href="/user">User</Link>
