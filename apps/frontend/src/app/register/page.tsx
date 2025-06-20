@@ -1,10 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { signUp, confirmSignUp } from "aws-amplify/auth";
+import { useEffect, useState } from "react";
+import {
+  signUp,
+  confirmSignUp,
+  autoSignIn,
+  SignUpOutput,
+  SignInOutput,
+} from "aws-amplify/auth";
 import Link from "next/link";
 
-export default function Register() {
+// Types representing the structure of the 'nextStep' object returned by AWS Amplify signUp and signIn methods
+type SignUpStateType = SignUpOutput["nextStep"];
+type SignInStateType = SignInOutput["nextStep"];
+
+/**
+ * Renders the initial user registration form.
+ * Handles user input for email and passwords, performs basic client-side validation,
+ * and initiates the user signup process with AWS Amplify.
+ */
+function RegistrationForm({
+  onStepChange,
+}: {
+  onStepChange: (step: SignUpStateType) => void;
+}) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [password2, setPassword2] = useState<string>("");
@@ -38,6 +57,7 @@ export default function Register() {
            * and user has been added to the Cognito User Pool with email_verified = false and confirmation status = "unconfirmed"
            */
           console.log("signUpStep:", nextStep.signUpStep);
+          onStepChange(nextStep);
         } catch (e) {}
       }}
     >
@@ -64,7 +84,7 @@ export default function Register() {
       </div>
 
       <div>
-        <label htmlFor="password">Retype password:</label>
+        <label htmlFor="password2">Retype password:</label>
         <input
           id="password2"
           type="password"
@@ -83,4 +103,114 @@ export default function Register() {
       </Link>
     </form>
   );
+}
+
+/**
+ * Renders the confirmation form for user email verification.
+ * This component prompts the user to enter the verification code received via email
+ * to confirm their newly created account in Cognito.
+ * It uses `aws-amplify/auth.confirmSignUp` to complete the verification process.
+ */
+function ConfirmSignUp({
+  onStepChange,
+}: {
+  onStepChange: (step: SignUpStateType) => void;
+}) {
+  const [verificationCode, setVerificationCode] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+
+  return (
+    <form
+      className="flex flex-col space-y-4"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        try {
+          const { nextStep } = await confirmSignUp({
+            confirmationCode: verificationCode,
+            username: email,
+          });
+
+          console.log("signUpStep:", nextStep.signUpStep);
+          onStepChange(nextStep);
+        } catch (e) {}
+      }}
+    >
+      <div>
+        <label htmlFor="email">Email:</label>
+        <input
+          id="email"
+          type="email"
+          className="bg-white"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="verificationCode">Verification code:</label>
+        <input
+          id="verificationCode"
+          type="text"
+          className="bg-white"
+          value={verificationCode}
+          onChange={(e) => setVerificationCode(e.target.value)}
+        />
+      </div>
+
+      <button className="btn bg-blue-500" type="submit">
+        Confirm
+      </button>
+    </form>
+  );
+}
+
+/**
+ * Attempts to automatically sign in the user.
+ * This component is rendered after a successful sign-up and email confirmation,
+ * especially when the `autoSignIn: true` option was used during the initial `signUp` call.
+ * It uses a `useEffect` hook to trigger the auto-sign-in process immediately upon mounting.
+ */
+function AutoSignIn({
+  onStepChange,
+}: {
+  onStepChange: (step: SignInStateType) => void;
+}) {
+  useEffect(() => {
+    const asyncSignIn = async () => {
+      const { nextStep } = await autoSignIn();
+      console.log("nextStep from AutoSignIn:", nextStep);
+      onStepChange(nextStep);
+    };
+
+    asyncSignIn();
+  }, []);
+  return <div>Signing in...</div>;
+}
+
+/**
+ * Render different components based on the registration flow state:
+ * 1. Show registration form initially
+ * 2. After registration, show confirmation form to enter verification code
+ * 3. After successful confirmation, auto sign-in and redirect authenticated user
+ */
+export default function Register() {
+  const [step, setStep] = useState<SignInStateType | SignUpStateType | null>(
+    null
+  );
+
+  if (step) {
+    // After user submits the registration form, the returned signUpStep will be 'CONFIRM_SIGN_UP', indicating email confirmation is required.
+    if ((step as SignUpStateType).signUpStep === "CONFIRM_SIGN_UP") {
+      return <ConfirmSignUp onStepChange={setStep} />;
+    }
+
+    // After user submits the verification code received by email, the returned signUpStep will be 'COMPLETE_AUTO_SIGN_IN', triggering automatic sign-in.
+    if ((step as SignUpStateType).signUpStep === "COMPLETE_AUTO_SIGN_IN") {
+      return <AutoSignIn onStepChange={setStep} />;
+    }
+
+    // TO-DO: Once AutoSignIn is done, page re-routing will be implemented
+  }
+
+  return <RegistrationForm onStepChange={setStep} />;
 }
