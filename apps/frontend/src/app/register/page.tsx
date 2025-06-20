@@ -37,7 +37,7 @@ export default function Register() {
         <label htmlFor="password">Retype password:</label>
         <input
           id="password2"
-          type="password2"
+          type="password"
           className="bg-white"
           value={password2}
           onChange={(e) => setPassword2(e.target.value)}
