@@ -9,6 +9,7 @@ import {
   SignInOutput,
 } from "aws-amplify/auth";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Types representing the structure of the 'nextStep' object returned by AWS Amplify signUp and signIn methods
 type SignUpStateType = SignUpOutput["nextStep"];
@@ -194,9 +195,20 @@ function AutoSignIn({
  * 3. After successful confirmation, auto sign-in and redirect authenticated user
  */
 export default function Register() {
+  const router = useRouter();
   const [step, setStep] = useState<SignInStateType | SignUpStateType | null>(
     null
   );
+
+  // useEffect that monitors the state of the step
+  useEffect(() => {
+    if (!step) return;
+
+    // If sign in was done, route to home page
+    if ((step as SignInStateType).signInStep === "DONE") {
+      router.push("./");
+    }
+  }, [step]);
 
   if (step) {
     // After user submits the registration form, the returned signUpStep will be 'CONFIRM_SIGN_UP', indicating email confirmation is required.
