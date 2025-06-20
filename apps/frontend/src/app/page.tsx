@@ -65,88 +65,86 @@ export default function Home() {
 
   return (
     <main className="flex flex-col m-8">
-      <div>
-        <form
-          className="flex flex-col space y-4"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            // console.log({inputText, inputLang, outputLang});
-            const result = await translateText({
-              inputText,
-              inputLang,
-              outputLang,
-            });
-            setOutputText(result);
-          }}
-        >
-          <div>
-            <label htmlFor="inputText">Input text</label>
-            <textarea
-              id="inputText"
-              className="bg-white"
-              value={inputText}
-              onChange={(event) => setInputText(event.target.value)}
-            />
-          </div>
-
-          <div className="my-1">
-            <label htmlFor="inputLang">Input language</label>
-            <textarea
-              id="inputLang"
-              className="bg-white"
-              value={inputLang}
-              onChange={(event) => setInputLang(event.target.value)}
-            />
-          </div>
-
-          <div className="my-1">
-            <label htmlFor="outputLang">Output language</label>
-            <textarea
-              id="outputLang"
-              className="bg-white"
-              value={outputLang}
-              onChange={(event) => setOutputLang(event.target.value)}
-            />
-          </div>
-
-          <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
-            Translate
-          </button>
-        </form>
-
+      <form
+        className="flex flex-col space y-4"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          // console.log({inputText, inputLang, outputLang});
+          const result = await translateText({
+            inputText,
+            inputLang,
+            outputLang,
+          });
+          setOutputText(result);
+        }}
+      >
         <div>
-          <p>Result:</p>
-          <pre className="whitespace-pre-wrap w-full">
-            {JSON.stringify(outputText)}
-          </pre>
+          <label htmlFor="inputText">Input text</label>
+          <textarea
+            id="inputText"
+            className="bg-white"
+            value={inputText}
+            onChange={(event) => setInputText(event.target.value)}
+          />
         </div>
 
-        <button
-          className="btn bg-blue-500 p-2 mt-2 rounded-xl"
-          type="button"
-          onClick={async () => {
-            const rtnValue = await getTranslations();
-            setTranslations(rtnValue);
-          }}
-        >
-          Get translations
+        <div className="my-1">
+          <label htmlFor="inputLang">Input language</label>
+          <input
+            id="inputLang"
+            className="bg-white"
+            value={inputLang}
+            onChange={(event) => setInputLang(event.target.value)}
+          />
+        </div>
+
+        <div className="my-1">
+          <label htmlFor="outputLang">Output language</label>
+          <input
+            id="outputLang"
+            className="bg-white"
+            value={outputLang}
+            onChange={(event) => setOutputLang(event.target.value)}
+          />
+        </div>
+
+        <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
+          Translate
         </button>
+      </form>
 
-        <div>
-          <p>Result:</p>
-          <pre>
-            {translations.map((item) => (
-              <div key={item.requestId}>
-                <p>
-                  {item.sourceLang} / {item.sourceText}
-                </p>
-                <p>
-                  {item.targetLang} / {item.targetText}
-                </p>
-              </div>
-            ))}
-          </pre>
-        </div>
+      <div>
+        <p>Result:</p>
+        <pre className="whitespace-pre-wrap w-full">
+          {JSON.stringify(outputText)}
+        </pre>
+      </div>
+
+      <button
+        className="btn bg-blue-500 p-2 mt-2 rounded-xl"
+        type="button"
+        onClick={async () => {
+          const rtnValue = await getTranslations();
+          setTranslations(rtnValue);
+        }}
+      >
+        Get translations
+      </button>
+
+      <div>
+        <p>Result:</p>
+        <pre>
+          {translations.map((item) => (
+            <div key={item.requestId}>
+              <p>
+                {item.sourceLang} / {item.sourceText}
+              </p>
+              <p>
+                {item.targetLang} / {item.targetText}
+              </p>
+            </div>
+          ))}
+        </pre>
       </div>
     </main>
   );
