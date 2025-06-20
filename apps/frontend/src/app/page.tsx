@@ -64,9 +64,10 @@ export default function Home() {
   );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex flex-col m-8">
       <div>
         <form
+          className="flex flex-col space y-4"
           onSubmit={async (event) => {
             event.preventDefault();
             // console.log({inputText, inputLang, outputLang});
@@ -88,7 +89,7 @@ export default function Home() {
             />
           </div>
 
-          <div>
+          <div className="my-1">
             <label htmlFor="inputLang">Input language</label>
             <textarea
               id="inputLang"
@@ -98,7 +99,7 @@ export default function Home() {
             />
           </div>
 
-          <div>
+          <div className="my-1">
             <label htmlFor="outputLang">Output language</label>
             <textarea
               id="outputLang"
