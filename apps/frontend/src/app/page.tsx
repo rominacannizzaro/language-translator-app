@@ -11,8 +11,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 // API Gateway URL (add the actual URL below)
 // const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
 
-// Function to make HTTP call to our server, make a translation request and receive it
-const translateText = async ({
+const translateUsersText = async ({
   inputLang,
   outputLang,
   inputText,
@@ -47,7 +46,7 @@ const translateText = async ({
   }
 };
 
-const getTranslations = async () => {
+const getUsersTranslations = async () => {
   try {
     const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
     const result = await fetch(URL, {
@@ -81,7 +80,7 @@ export default function Home() {
         onSubmit={async (event) => {
           event.preventDefault();
           // console.log({inputText, inputLang, outputLang});
-          const result = await translateText({
+          const result = await translateUsersText({
             inputText,
             inputLang,
             outputLang,
@@ -135,7 +134,7 @@ export default function Home() {
         className="btn bg-blue-500 p-2 mt-2 rounded-xl"
         type="button"
         onClick={async () => {
-          const rtnValue = await getTranslations();
+          const rtnValue = await getUsersTranslations();
           setTranslations(rtnValue);
         }}
       >
