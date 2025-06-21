@@ -112,7 +112,11 @@ export const userTranslate: lambda.APIGatewayProxyHandler = async function (
 export const getUserTranslations: lambda.APIGatewayProxyHandler =
   async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
     try {
-      const rtnData = await translateTable.getAll();
+      const username = getUsername(event);
+      console.log({ username });
+
+      const rtnData = await translateTable.query({ username }); // Queries the table using username as the partition key and fetches translations for that username
+
       return gateway.createSuccessJsonResponse(rtnData);
     } catch (e: any) {
       return gateway.createErrorJsonResponse(e);
