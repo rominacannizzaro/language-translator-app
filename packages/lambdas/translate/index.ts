@@ -36,20 +36,26 @@ const translateTable = new TranslationTable({
   sortKey: TRANSLATION_SORT_KEY,
 });
 
+const getUsername = (event: lambda.APIGatewayProxyEvent) => {
+  const claims = event.requestContext.authorizer?.claims;
+  if (!claims) {
+    throw new Error("User not authenticated.");
+  }
+
+  const username = claims["cognito:username"];
+  if (!username) {
+    throw new Error("Username does not exist.");
+  }
+
+  return username;
+};
+
 export const userTranslate: lambda.APIGatewayProxyHandler = async function (
   event: lambda.APIGatewayProxyEvent,
   context: lambda.Context
 ) {
   try {
-    const claims = event.requestContext.authorizer?.claims;
-    if (!claims) {
-      throw new Error("User not authenticated.");
-    }
-
-    const username = claims["cognito:username"];
-    if (!username) {
-      throw new Error("Username does not exist.");
-    }
+    const username = getUsername(event);
     console.log({ username });
 
     if (!event.body) {
