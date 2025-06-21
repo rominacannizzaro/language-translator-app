@@ -60,13 +60,27 @@ export class RestApiService extends Construct {
   addTranslateMethod({
     httpMethod,
     lambda,
+    isAuth,
   }: {
     httpMethod: string;
     lambda: lambda.IFunction;
+    isAuth?: boolean;
   }) {
+    let options: apigateway.MethodOptions = {};
+    if (isAuth) {
+      if (!this.authorizer) {
+        throw new Error("Authorizer is not set");
+      }
+
+      options = {
+        authorizer: this.authorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      };
+    }
     this.restApi.root.addMethod(
       httpMethod,
-      new apigateway.LambdaIntegration(lambda)
+      new apigateway.LambdaIntegration(lambda),
+      options
     );
   }
 }
