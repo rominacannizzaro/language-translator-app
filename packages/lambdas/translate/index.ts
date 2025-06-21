@@ -11,7 +11,11 @@ import {
   TranslateDbObject,
 } from "@translator/shared-types";
 
-const { TRANSLATION_TABLE_NAME, TRANSLATION_PARTITION_KEY } = process.env;
+const {
+  TRANSLATION_TABLE_NAME,
+  TRANSLATION_PARTITION_KEY,
+  TRANSLATION_SORT_KEY,
+} = process.env;
 
 if (!TRANSLATION_TABLE_NAME) {
   throw new exception.MissingEnvironmentVariable("TRANSLATION_TABLE_NAME");
@@ -21,10 +25,15 @@ if (!TRANSLATION_PARTITION_KEY) {
   throw new exception.MissingEnvironmentVariable("TRANSLATION_PARTITION_KEY");
 }
 
+if (!TRANSLATION_SORT_KEY) {
+  throw new exception.MissingEnvironmentVariable("TRANSLATION_SORT_KEY");
+}
+
 // Create instance of TranslationTable
 const translateTable = new TranslationTable({
   tableName: TRANSLATION_TABLE_NAME,
   partitionKey: TRANSLATION_PARTITION_KEY,
+  sortKey: TRANSLATION_SORT_KEY,
 });
 
 export const translate: lambda.APIGatewayProxyHandler = async function (
@@ -79,6 +88,7 @@ export const translate: lambda.APIGatewayProxyHandler = async function (
     // tableObj is the object stored to the database
     const tableObj: TranslateDbObject = {
       requestId: context.awsRequestId, // requestId is the primary key. It must be unique per translation request. context.awsRequestId provides a unique id per lambda call.
+      username,
       ...body,
       ...rtnData,
     };
