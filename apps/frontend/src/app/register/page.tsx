@@ -59,7 +59,9 @@ function RegistrationForm({
            */
           console.log("signUpStep:", nextStep.signUpStep);
           onStepChange(nextStep);
-        } catch (e) {}
+        } catch (e) {
+          console.error("Registration error:", e);
+        }
       }}
     >
       <div>
@@ -133,7 +135,9 @@ function ConfirmSignUp({
 
           console.log("signUpStep:", nextStep.signUpStep);
           onStepChange(nextStep);
-        } catch (e) {}
+        } catch (e) {
+          console.error("Confirmation error:", e);
+        }
       }}
     >
       <div>
