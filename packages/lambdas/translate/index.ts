@@ -36,7 +36,7 @@ const translateTable = new TranslationTable({
   sortKey: TRANSLATION_SORT_KEY,
 });
 
-export const translate: lambda.APIGatewayProxyHandler = async function (
+export const userTranslate: lambda.APIGatewayProxyHandler = async function (
   event: lambda.APIGatewayProxyEvent,
   context: lambda.Context
 ) {
@@ -103,14 +103,12 @@ export const translate: lambda.APIGatewayProxyHandler = async function (
 };
 
 // Function that returns translations
-export const getTranslations: lambda.APIGatewayProxyHandler = async function (
-  event: lambda.APIGatewayProxyEvent,
-  context: lambda.Context
-) {
-  try {
-    const rtnData = await translateTable.getAll();
-    return gateway.createSuccessJsonResponse(rtnData);
-  } catch (e: any) {
-    return gateway.createErrorJsonResponse(e);
-  }
-};
+export const getUserTranslations: lambda.APIGatewayProxyHandler =
+  async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
+    try {
+      const rtnData = await translateTable.getAll();
+      return gateway.createSuccessJsonResponse(rtnData);
+    } catch (e: any) {
+      return gateway.createErrorJsonResponse(e);
+    }
+  };
