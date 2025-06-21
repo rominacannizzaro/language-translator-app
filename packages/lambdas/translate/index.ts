@@ -32,6 +32,17 @@ export const translate: lambda.APIGatewayProxyHandler = async function (
   context: lambda.Context
 ) {
   try {
+    const claims = event.requestContext.authorizer?.claims;
+    if (!claims) {
+      throw new Error("User not authenticated.");
+    }
+
+    const username = claims["cognito:username"];
+    if (!username) {
+      throw new Error("Username does not exist.");
+    }
+    console.log({ username });
+
     if (!event.body) {
       throw new exception.MissingBodyData();
     }
