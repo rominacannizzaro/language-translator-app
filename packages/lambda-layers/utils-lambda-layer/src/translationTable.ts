@@ -5,22 +5,26 @@ import { TranslateDbObject } from "@translator/shared-types";
 export class TranslationTable {
   tableName: string;
   partitionKey: string;
+  sortKey: string;
   dynamodbClient: dynamodb.DynamoDBClient;
   constructor({
     tableName,
     partitionKey,
+    sortKey,
   }: {
     tableName: string;
     partitionKey: string;
+    sortKey: string;
   }) {
     this.tableName = tableName;
     this.partitionKey = partitionKey;
+    this.sortKey = sortKey;
     this.dynamodbClient = new dynamodb.DynamoDBClient({});
   }
 
   // Insert translation
   async insert(data: TranslateDbObject) {
-    // Put Item Command Input
+    // Prepare PutItemCommand input
     const tableInsertCommand: dynamodb.PutItemCommandInput = {
       TableName: this.tableName,
       Item: marshall(data), // marshall converts the original data into a format that is suitable to be stored into DynamoDB
@@ -30,6 +34,35 @@ export class TranslationTable {
     await this.dynamodbClient.send(
       new dynamodb.PutItemCommand(tableInsertCommand)
     );
+  }
+
+  // Method to query translations based on the partition key (username)
+  async query({ username }: { username: string }) {
+    // QueryCommand input
+    const queryCommand: dynamodb.QueryCommandInput = {
+      TableName: this.tableName,
+      KeyConditionExpression: "#PARTITION_KEY = :username", // defines key-value condition for the partition key
+      ExpressionAttributeNames: {
+        "#PARTITION_KEY": "username", // Maps the placeholder '#PARTITION_KEY' to the actual attribute name 'username'
+      },
+      ExpressionAttributeValues: {
+        ":username": { S: username }, // Maps the placeholder ':username' to the provided username value
+      },
+      ScanIndexForward: true, // Orders the query results by the sort key in ascending order (true for A-Z, 0-9)
+    };
+
+    // Execute Query Command
+    const { Items } = await this.dynamodbClient.send(
+      new dynamodb.QueryCommand(queryCommand)
+    );
+
+    if (!Items) {
+      return [];
+    }
+
+    const rtnData = Items.map((item) => unmarshall(item) as TranslateDbObject);
+
+    return rtnData;
   }
 
   // Get all translations
