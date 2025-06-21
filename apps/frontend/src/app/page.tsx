@@ -6,6 +6,7 @@ import {
   TranslateRequest,
   TranslateResponse,
 } from "@translator/shared-types";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 // API Gateway URL (add the actual URL below)
 // const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
@@ -27,9 +28,15 @@ const translateText = async ({
       sourceText: inputText,
     };
 
+    // Get the logged-in user's ID token from Cognito - required in the Authorization header to authenticate API requests
+    const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
+
     const result = await fetch(`${URL}`, {
       method: "POST",
       body: JSON.stringify(request),
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
     });
 
     const rtnValue = (await result.json()) as TranslateResponse;
@@ -42,8 +49,12 @@ const translateText = async ({
 
 const getTranslations = async () => {
   try {
+    const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
     const result = await fetch(URL, {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
     });
 
     const rtnValue = (await result.json()) as Array<TranslateDbObject>;
