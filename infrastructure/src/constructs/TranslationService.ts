@@ -35,6 +35,10 @@ export class TranslationService extends Construct {
     const table = new dynamoDb.Table(this, "translations", {
       tableName: "translation",
       partitionKey: {
+        name: "username",
+        type: dynamoDb.AttributeType.STRING,
+      },
+      sortKey: {
         name: "requestId",
         type: dynamoDb.AttributeType.STRING,
       },
@@ -55,6 +59,7 @@ export class TranslationService extends Construct {
         "dynamodb:Scan",
         "dynamodb:GetItem",
         "dynamodb:DeleteItem",
+        "dynamodb:Query", // use Query command to extract the information needed per user
       ],
       resources: ["*"],
     });
@@ -66,16 +71,19 @@ export class TranslationService extends Construct {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    const environment = {
+      TRANSLATION_TABLE_NAME: table.tableName,
+      TRANSLATION_PARTITION_KEY: "username",
+      TRANSLATION_SORT_KEY: "requestId",
+    };
+
     // Lambda function that performs translation
     const translateLambda = createNodeJsLambda(this, "translateLambda", {
       lambdaRelativePath: "translate/index.ts",
       handler: "translate",
       initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
       lambdaLayers: [utilsLambdaLayer],
-      environment: {
-        TRANSLATION_TABLE_NAME: table.tableName,
-        TRANSLATION_PARTITION_KEY: "requestId",
-      },
+      environment,
     });
 
     // Add translateLambda to Rest API
@@ -94,10 +102,7 @@ export class TranslationService extends Construct {
         handler: "getTranslations",
         initialPolicy: [translateTablePolicy],
         lambdaLayers: [utilsLambdaLayer],
-        environment: {
-          TRANSLATION_TABLE_NAME: table.tableName,
-          TRANSLATION_PARTITION_KEY: "requestId",
-        },
+        environment,
       }
     );
 
