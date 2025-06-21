@@ -5,11 +5,13 @@ import * as cognito from "aws-cdk-lib/aws-cognito";
 export interface UserAuthSupportService extends cdk.StackProps {}
 
 export class UserAuthSupportService extends Construct {
+  userPool: cognito.UserPool;
+
   constructor(scope: Construct, id: string, props?: UserAuthSupportService) {
     super(scope, id);
 
     // Cognito UserPool construct
-    const userPool = new cognito.UserPool(this, "translatorUserPool", {
+    this.userPool = new cognito.UserPool(this, "translatorUserPool", {
       selfSignUpEnabled: true, // Allows users to register themselves (self-registration). If set to 'false', only admin can create users.
       signInAliases: { email: true }, // Controls sign-in method. User is allowed to sign in using their email address (not phone number, etc.).
       autoVerify: { email: true }, // Cognito will automatically send a verification email to confirm user's email address after sign up.
@@ -22,7 +24,7 @@ export class UserAuthSupportService extends Construct {
       this,
       "translatorUserPoolClient",
       {
-        userPool, // Attach userPool to UserPoolClient
+        userPool: this.userPool, // Attach userPool to UserPoolClient
         userPoolClientName: "translator-web-client",
         generateSecret: false, // No client secret (suitable for public clients like SPAs)
         supportedIdentityProviders: [
@@ -33,7 +35,7 @@ export class UserAuthSupportService extends Construct {
 
     // Output userPool ID
     new cdk.CfnOutput(this, "userPoolId", {
-      value: userPool.userPoolId,
+      value: this.userPool.userPoolId,
     });
 
     // Output userPoolClient ID
