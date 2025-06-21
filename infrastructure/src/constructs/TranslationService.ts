@@ -80,7 +80,7 @@ export class TranslationService extends Construct {
     // Lambda function that performs translation
     const translateLambda = createNodeJsLambda(this, "translateLambda", {
       lambdaRelativePath: "translate/index.ts",
-      handler: "translate",
+      handler: "userTranslate",
       initialPolicy: [translateServicePolicy, translateTablePolicy], // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
       lambdaLayers: [utilsLambdaLayer],
       environment,
@@ -99,7 +99,7 @@ export class TranslationService extends Construct {
       "getTranslationsLambda",
       {
         lambdaRelativePath: "translate/index.ts",
-        handler: "getTranslations",
+        handler: "getUserTranslations",
         initialPolicy: [translateTablePolicy],
         lambdaLayers: [utilsLambdaLayer],
         environment,
