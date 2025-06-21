@@ -11,6 +11,36 @@ import { fetchAuthSession } from "aws-amplify/auth";
 // API Gateway URL (add the actual URL below)
 // const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
 
+// Available-to-all function to make HTTP call to our server, make a translation request and receive it
+const translateText = async ({
+  inputLang,
+  outputLang,
+  inputText,
+}: {
+  inputLang: string;
+  outputLang: string;
+  inputText: string;
+}) => {
+  try {
+    const request: TranslateRequest = {
+      sourceLang: inputLang,
+      targetLang: outputLang,
+      sourceText: inputText,
+    };
+
+    const result = await fetch(`${URL}/public`, {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+
+    const rtnValue = (await result.json()) as TranslateResponse;
+    return rtnValue;
+  } catch (e: unknown) {
+    console.error(e);
+    throw e;
+  }
+};
+
 const translateUsersText = async ({
   inputLang,
   outputLang,
@@ -30,7 +60,7 @@ const translateUsersText = async ({
     // Get the logged-in user's ID token from Cognito - required in the Authorization header to authenticate API requests
     const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
 
-    const result = await fetch(`${URL}`, {
+    const result = await fetch(`${URL}/user`, {
       method: "POST",
       body: JSON.stringify(request),
       headers: {
@@ -49,7 +79,7 @@ const translateUsersText = async ({
 const getUsersTranslations = async () => {
   try {
     const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
-    const result = await fetch(URL, {
+    const result = await fetch(`${URL}/user`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -80,7 +110,7 @@ export default function Home() {
         onSubmit={async (event) => {
           event.preventDefault();
           // console.log({inputText, inputLang, outputLang});
-          const result = await translateUsersText({
+          const result = await translateText({
             inputText,
             inputLang,
             outputLang,
