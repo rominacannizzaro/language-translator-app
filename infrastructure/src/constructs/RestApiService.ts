@@ -32,6 +32,13 @@ export class RestApiService extends Construct {
         domainName: apiUrl,
         certificate,
       },
+      // Add CORS to enable frontend app running on localhost during development to successfully communicate with the backend
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowCredentials: true,
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+      },
     });
 
     // If a Cognito user pool is provided, create a Cognito authorizer for the API Gateway
