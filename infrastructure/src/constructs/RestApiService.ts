@@ -5,19 +5,23 @@ import * as route53 from "aws-cdk-lib/aws-route53";
 import * as route53Targets from "aws-cdk-lib/aws-route53-targets";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 
 export interface RestApiServiceProps extends cdk.StackProps {
   apiUrl: string;
   certificate: acm.Certificate;
   zone: route53.IHostedZone;
+  userPool?: cognito.UserPool;
 }
 
 export class RestApiService extends Construct {
   public restApi: apigateway.RestApi;
+  public authorizer?: apigateway.CognitoUserPoolsAuthorizer;
+
   constructor(
     scope: Construct,
     id: string,
-    { apiUrl, certificate, zone }: RestApiServiceProps
+    { apiUrl, certificate, zone, userPool }: RestApiServiceProps
   ) {
     super(scope, id);
 
@@ -29,6 +33,19 @@ export class RestApiService extends Construct {
         certificate,
       },
     });
+
+    // If a Cognito user pool is provided, create a Cognito authorizer for the API Gateway
+    // to check if incoming requests are from valid logged-in user
+    if (userPool) {
+      this.authorizer = new apigateway.CognitoUserPoolsAuthorizer(
+        this.restApi,
+        "authorizer",
+        {
+          cognitoUserPools: [userPool],
+          authorizerName: "userPoolAuthorizer",
+        }
+      );
+    }
 
     // Create Route 53 A record for the the rest api
     new route53.ARecord(this, "apiDns", {
