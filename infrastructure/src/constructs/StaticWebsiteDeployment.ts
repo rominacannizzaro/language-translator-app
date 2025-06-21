@@ -52,11 +52,13 @@ export class StaticWebsiteDeployment extends Construct {
     });
 
     // s3 construct to deploy the website dist content
+    // Automates uploading the website files from the local project directory to the S3 bucket "WebsiteBucket"
     new s3deploy.BucketDeployment(this, "WebsiteDeploy", {
       destinationBucket: bucket,
       sources: [s3deploy.Source.asset(frontendDistPath)],
       distribution: distro,
       distributionPaths: ["/*"],
+      memoryLimit: 512, // the default memory limit is 128 MB, which is small for this project's frontend, may cause crashes
     });
 
     // Create two Route 53 A records for the domain and full URL to route traffic to the CloudFront distribution
