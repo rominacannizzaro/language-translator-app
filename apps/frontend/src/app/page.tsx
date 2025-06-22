@@ -3,13 +3,20 @@
 import { useState } from "react";
 import { TranslateResult, TranslateResponse } from "@translator/shared-types";
 import { getCurrentUser } from "aws-amplify/auth";
+import { useTranslate } from "@/hooks";
 
 export default function Home() {
   const [inputText, setInputText] = useState<string>("");
   const [inputLang, setInputLang] = useState<string>("");
   const [outputLang, setOutputLang] = useState<string>("");
   const [outputText, setOutputText] = useState<TranslateResponse | null>(null);
-  const [translations, setTranslations] = useState<Array<TranslateResult>>([]);
+  // const [translations, setTranslations] = useState<Array<TranslateResult>>([]);
+
+  const { isLoading, translations } = useTranslate();
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <main className="flex flex-col m-8">
@@ -19,25 +26,25 @@ export default function Home() {
           event.preventDefault();
           let result = null;
 
-          try {
-            // Route the translation request to the public or authenticated endpoint based on user being logged in or not
-            const user = await getCurrentUser();
-            if (user) {
-              result = await translateUsersText({
-                inputText,
-                inputLang,
-                outputLang,
-              });
-            } else {
-              throw new Error("User is not logged in.");
-            }
-          } catch {
-            result = await translatePublicText({
-              inputText,
-              inputLang,
-              outputLang,
-            });
-          }
+          // try {
+          //   // Route the translation request to the public or authenticated endpoint based on user being logged in or not
+          //   const user = await getCurrentUser();
+          //   if (user) {
+          //     result = await translateUsersText({
+          //       inputText,
+          //       inputLang,
+          //       outputLang,
+          //     });
+          //   } else {
+          //     throw new Error("User is not logged in.");
+          //   }
+          // } catch {
+          //   result = await translatePublicText({
+          //     inputText,
+          //     inputLang,
+          //     outputLang,
+          //   });
+          // }
           console.log("result: ", result);
           setOutputText(result);
         }}
@@ -84,7 +91,7 @@ export default function Home() {
         </pre>
       </div>
 
-      <button
+      {/* <button
         className="btn bg-blue-500"
         type="button"
         onClick={async () => {
@@ -93,7 +100,7 @@ export default function Home() {
         }}
       >
         Get translations
-      </button>
+      </button> */}
 
       <div className="flex flex-col space-y-1 p-1">
         {translations.map((item) => (
@@ -107,7 +114,7 @@ export default function Home() {
             <p>
               {item.targetLang} / {item.targetText}
             </p>
-            <button
+            {/* <button
               className="btn p-1 bg-red-500 hover:bg-red-300 rounded-md"
               type="button"
               onClick={async () => {
@@ -119,7 +126,7 @@ export default function Home() {
               }}
             >
               X
-            </button>
+            </button> */}
           </div>
         ))}
       </div>
