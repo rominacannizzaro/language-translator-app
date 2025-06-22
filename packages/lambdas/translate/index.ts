@@ -50,45 +50,66 @@ const getUsername = (event: lambda.APIGatewayProxyEvent) => {
   return username;
 };
 
+const parseTranslateRequest = (requestString: string) => {
+  const request = JSON.parse(requestString) as TranslateRequest; // the translate object that comes in into the lambda
+
+  if (!request.sourceLang) {
+    throw new exception.MissingParameters("sourceLang");
+  }
+  if (!request.targetLang) {
+    throw new exception.MissingParameters("targetLang");
+  }
+  if (!request.sourceText) {
+    throw new exception.MissingParameters("sourceText");
+  }
+
+  return request;
+};
+
+const parseDeleteRequest = (requestString: string) => {
+  const request = JSON.parse(requestString) as { requestId: string };
+  if (!request.requestId) {
+    throw new exception.MissingParameters("requestId");
+  }
+
+  return request;
+};
+
+const getCurrentTime = () => {
+  return Date.now();
+};
+
+const formatTime = (time: number) => {
+  return new Date(time).toString();
+};
+
 // Lambda handler for public translation requests without requiring user authentication
 export const publicTranslate: lambda.APIGatewayProxyHandler = async function (
-  event: lambda.APIGatewayProxyEvent,
-  context: lambda.Context
+  event: lambda.APIGatewayProxyEvent
 ) {
   try {
     if (!event.body) {
       throw new exception.MissingBodyData();
     }
 
-    const body = JSON.parse(event.body) as TranslateRequest; // the translate object that comes in into the lambda
-
-    if (!body.sourceLang) {
-      throw new exception.MissingParameters("sourceLang");
-    }
-    if (!body.targetLang) {
-      throw new exception.MissingParameters("targetLang");
-    }
-    if (!body.sourceText) {
-      throw new exception.MissingParameters("sourceText");
-    }
-
-    // Get current time in human-readable format
-    const now = new Date(Date.now()).toString();
-
-    // Wait for translation
-    const result = await getTranslation(body);
-
-    if (!result.TranslatedText) {
-      throw new exception.MissingParameters("TranslationText");
-    }
+    const request = parseTranslateRequest(event.body);
+    const nowEpoch = getCurrentTime();
+    const targetText = await getTranslation(request); // Wait for translation
 
     // Object for the response
-    const rtnData: TranslateResponse = {
-      timestamp: now,
-      targetText: result.TranslatedText,
+    const response: TranslateResponse = {
+      timestamp: formatTime(nowEpoch),
+      targetText,
     };
 
-    return gateway.createSuccessJsonResponse(rtnData);
+    const result: TranslateResult = {
+      requestId: nowEpoch.toString(),
+      username: "",
+      ...request,
+      ...response,
+    };
+
+    return gateway.createSuccessJsonResponse(result);
   } catch (e: any) {
     console.error(e);
     return gateway.createErrorJsonResponse(e);
@@ -96,57 +117,37 @@ export const publicTranslate: lambda.APIGatewayProxyHandler = async function (
 };
 
 export const userTranslate: lambda.APIGatewayProxyHandler = async function (
-  event: lambda.APIGatewayProxyEvent,
-  context: lambda.Context
+  event: lambda.APIGatewayProxyEvent
 ) {
   try {
-    const username = getUsername(event);
-    console.log({ username });
-
     if (!event.body) {
       throw new exception.MissingBodyData();
     }
 
-    const body = JSON.parse(event.body) as TranslateRequest; // the translate object that comes in into the lambda
-
-    if (!body.sourceLang) {
-      throw new exception.MissingParameters("sourceLang");
-    }
-    if (!body.targetLang) {
-      throw new exception.MissingParameters("targetLang");
-    }
-    if (!body.sourceText) {
-      throw new exception.MissingParameters("sourceText");
-    }
-
-    // Get current time in human-readable format
+    const username = getUsername(event);
+    const request = parseTranslateRequest(event.body);
     const now = new Date(Date.now()).toString();
-
-    // Wait for translation
-    const result = await getTranslation(body);
-
-    if (!result.TranslatedText) {
-      throw new exception.MissingParameters("TranslationText");
-    }
+    const nowEpoch = getCurrentTime();
+    const targetText = await getTranslation(request); // Wait for translation
 
     // Object for the response
-    const rtnData: TranslateResponse = {
-      timestamp: now,
-      targetText: result.TranslatedText,
+    const response: TranslateResponse = {
+      timestamp: formatTime(nowEpoch),
+      targetText,
     };
 
     // Prepare to store the translation into the translation table
-    // tableObj is the object stored to the database
-    const tableObj: TranslateResult = {
-      requestId: context.awsRequestId, // requestId is the primary key. It must be unique per translation request. context.awsRequestId provides a unique id per lambda call.
+    // result is the object stored to the database
+    const result: TranslateResult = {
+      requestId: nowEpoch.toString(),
       username,
-      ...body,
-      ...rtnData,
+      ...request,
+      ...response,
     };
 
-    await translateTable.insert(tableObj);
+    await translateTable.insert(result);
 
-    return gateway.createSuccessJsonResponse(rtnData);
+    return gateway.createSuccessJsonResponse(result);
   } catch (e: any) {
     console.error(e);
     return gateway.createErrorJsonResponse(e);
@@ -158,8 +159,6 @@ export const getUserTranslations: lambda.APIGatewayProxyHandler =
   async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
     try {
       const username = getUsername(event);
-      console.log({ username });
-
       const rtnData = await translateTable.query({ username }); // Queries the table using username as the partition key and fetches translations for that username
 
       return gateway.createSuccessJsonResponse(rtnData);
@@ -172,20 +171,12 @@ export const getUserTranslations: lambda.APIGatewayProxyHandler =
 export const deleteUserTranslation: lambda.APIGatewayProxyHandler =
   async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
     try {
-      const username = getUsername(event);
-      console.log({ username });
-
       if (!event.body) {
         throw new exception.MissingBodyData();
       }
 
-      const body = JSON.parse(event.body) as { requestId: string };
-      if (!body.requestId) {
-        throw new exception.MissingParameters("requestId");
-      }
-
-      let requestId = body.requestId;
-
+      const username = getUsername(event);
+      const { requestId } = parseDeleteRequest(event.body);
       const rtnData = await translateTable.delete({ username, requestId }); // Delete using username and requestId as parameters
 
       return gateway.createSuccessJsonResponse(rtnData);
