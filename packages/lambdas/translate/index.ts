@@ -167,3 +167,29 @@ export const getUserTranslations: lambda.APIGatewayProxyHandler =
       return gateway.createErrorJsonResponse(e);
     }
   };
+
+// Lambda handler to delete a user's translation
+export const deleteUserTranslation: lambda.APIGatewayProxyHandler =
+  async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
+    try {
+      const username = getUsername(event);
+      console.log({ username });
+
+      if (!event.body) {
+        throw new exception.MissingBodyData();
+      }
+
+      const body = JSON.parse(event.body) as { requestId: string };
+      if (!body.requestId) {
+        throw new exception.MissingParameters("requestId");
+      }
+
+      let requestId = body.requestId;
+
+      const rtnData = await translateTable.delete({ username, requestId }); // Delete using username and requestId as parameters
+
+      return gateway.createSuccessJsonResponse(rtnData);
+    } catch (e: any) {
+      return gateway.createErrorJsonResponse(e);
+    }
+  };

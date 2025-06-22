@@ -65,6 +65,31 @@ export class TranslationTable {
     return rtnData;
   }
 
+  // Delete a translation item based on username and requestId
+  async delete({
+    username,
+    requestId,
+  }: {
+    username: string;
+    requestId: string;
+  }) {
+    // Prepare input for DynamoDB DeleteItemCommand
+    const deleteCommand: dynamodb.DeleteItemCommandInput = {
+      TableName: this.tableName,
+      Key: {
+        [this.partitionKey]: { S: username },
+        [this.sortKey]: { S: requestId },
+      },
+    };
+
+    // Execute the DeleteItemCommand to remove the item from the table
+    await this.dynamodbClient.send(
+      new dynamodb.DeleteItemCommand(deleteCommand)
+    );
+    // After deletion, query for remaining items for the given username and return the result
+    return this.query({ username });
+  }
+
   // Get all translations
   async getAll() {
     // Scan Command Input

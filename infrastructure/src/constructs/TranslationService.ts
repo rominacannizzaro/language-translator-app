@@ -115,6 +115,27 @@ export class TranslationService extends Construct {
       isAuth: true,
     });
 
+    // Lambda function that handles deleting user translations
+    const userDeleteTranslateLambda = createNodeJsLambda(
+      this,
+      "userDeleteTranslateLambda",
+      {
+        lambdaRelativePath: "translate/index.ts",
+        handler: "deleteUserTranslation",
+        initialPolicy: [translateTablePolicy],
+        lambdaLayers: [utilsLambdaLayer],
+        environment,
+      }
+    );
+
+    // Add DELETE method to the Rest API for the user translations resource (/user), linked to userDeleteTranslateLambda
+    restApi.addTranslateMethod({
+      resource: restApi.userResource,
+      httpMethod: "DELETE",
+      lambda: userDeleteTranslateLambda,
+      isAuth: true,
+    });
+
     const publicTranslateLambda = createNodeJsLambda(
       this,
       "publicTranslateLambda",
