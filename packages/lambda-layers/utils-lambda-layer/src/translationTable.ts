@@ -1,6 +1,6 @@
 import * as dynamodb from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import { TranslateDbObject } from "@translator/shared-types";
+import { TranslateResult } from "@translator/shared-types";
 
 export class TranslationTable {
   tableName: string;
@@ -23,7 +23,7 @@ export class TranslationTable {
   }
 
   // Insert translation
-  async insert(data: TranslateDbObject) {
+  async insert(data: TranslateResult) {
     // Prepare PutItemCommand input
     const tableInsertCommand: dynamodb.PutItemCommandInput = {
       TableName: this.tableName,
@@ -60,7 +60,7 @@ export class TranslationTable {
       return [];
     }
 
-    const rtnData = Items.map((item) => unmarshall(item) as TranslateDbObject);
+    const rtnData = Items.map((item) => unmarshall(item) as TranslateResult);
 
     return rtnData;
   }
@@ -107,7 +107,7 @@ export class TranslationTable {
       return [];
     }
 
-    const rtnData = Items.map((item) => unmarshall(item) as TranslateDbObject);
+    const rtnData = Items.map((item) => unmarshall(item) as TranslateResult);
 
     return rtnData;
   }

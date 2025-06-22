@@ -8,7 +8,7 @@ import {
 import {
   TranslateRequest,
   TranslateResponse,
-  TranslateDbObject,
+  TranslateResult,
 } from "@translator/shared-types";
 
 const {
@@ -137,7 +137,7 @@ export const userTranslate: lambda.APIGatewayProxyHandler = async function (
 
     // Prepare to store the translation into the translation table
     // tableObj is the object stored to the database
-    const tableObj: TranslateDbObject = {
+    const tableObj: TranslateResult = {
       requestId: context.awsRequestId, // requestId is the primary key. It must be unique per translation request. context.awsRequestId provides a unique id per lambda call.
       username,
       ...body,

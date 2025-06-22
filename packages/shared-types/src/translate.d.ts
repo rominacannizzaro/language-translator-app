@@ -12,7 +12,7 @@ export type TranslateResponse = {
 };
 
 // Type that represents the data to be stored in the database
-export type TranslateDbObject = TranslateRequest &
+export type TranslateResult = TranslateRequest &
   TranslateResponse & {
     username: string;
     requestId: string;

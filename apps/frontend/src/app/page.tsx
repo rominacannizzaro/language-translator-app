@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  TranslateDbObject,
+  TranslateResult,
   TranslateRequest,
   TranslateResponse,
 } from "@translator/shared-types";
@@ -86,7 +86,7 @@ const getUsersTranslations = async () => {
       },
     });
 
-    const rtnValue = (await result.json()) as Array<TranslateDbObject>;
+    const rtnValue = (await result.json()) as Array<TranslateResult>;
     return rtnValue;
   } catch (e: unknown) {
     console.error(e);
@@ -108,7 +108,7 @@ const deleteUserTranslation = async (item: {
       },
     });
 
-    const rtnValue = (await result.json()) as Array<TranslateDbObject>;
+    const rtnValue = (await result.json()) as Array<TranslateResult>;
     return rtnValue;
   } catch (e: unknown) {
     console.error(e);
@@ -121,9 +121,7 @@ export default function Home() {
   const [inputLang, setInputLang] = useState<string>("");
   const [outputLang, setOutputLang] = useState<string>("");
   const [outputText, setOutputText] = useState<TranslateResponse | null>(null);
-  const [translations, setTranslations] = useState<Array<TranslateDbObject>>(
-    []
-  );
+  const [translations, setTranslations] = useState<Array<TranslateResult>>([]);
 
   return (
     <main className="flex flex-col m-8">
