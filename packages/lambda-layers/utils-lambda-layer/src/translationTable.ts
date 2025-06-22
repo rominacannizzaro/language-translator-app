@@ -66,13 +66,13 @@ export class TranslationTable {
   }
 
   // Delete a translation by username and requestId, then returns remaining translations for this user
-  async delete({ username, requestId }: TranslatePrimaryKey) {
+  async delete(item: TranslatePrimaryKey) {
     // Prepare input for DynamoDB DeleteItemCommand
     const deleteCommand: dynamodb.DeleteItemCommandInput = {
       TableName: this.tableName,
       Key: {
-        [this.partitionKey]: { S: username },
-        [this.sortKey]: { S: requestId },
+        [this.partitionKey]: { S: item.username },
+        [this.sortKey]: { S: item.requestId },
       },
     };
 
@@ -81,7 +81,7 @@ export class TranslationTable {
       new dynamodb.DeleteItemCommand(deleteCommand)
     );
     // After deletion, query for remaining items for the given username and return the result
-    return this.query({ username, requestId: "" });
+    return item;
   }
 
   // Get all translation records
