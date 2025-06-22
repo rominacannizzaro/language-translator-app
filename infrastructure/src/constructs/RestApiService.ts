@@ -17,6 +17,8 @@ export interface RestApiServiceProps extends cdk.StackProps {
 export class RestApiService extends Construct {
   public restApi: apigateway.RestApi;
   public authorizer?: apigateway.CognitoUserPoolsAuthorizer;
+  public publicResource: apigateway.Resource;
+  public userResource: apigateway.Resource;
 
   constructor(
     scope: Construct,
@@ -40,6 +42,10 @@ export class RestApiService extends Construct {
         allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
       },
     });
+
+    // Define '/public' and '/user' API Gateway resource (paths) to segregate public and user-specific translation endpoints
+    this.publicResource = this.restApi.root.addResource("public");
+    this.userResource = this.restApi.root.addResource("user");
 
     // If a Cognito user pool is provided, create a Cognito authorizer for the API Gateway
     // to check if incoming requests are from valid logged-in user
