@@ -123,7 +123,7 @@ export default function Home() {
             } else {
               throw new Error("User is not logged in.");
             }
-          } catch (e) {
+          } catch {
             result = await translatePublicText({
               inputText,
               inputLang,
