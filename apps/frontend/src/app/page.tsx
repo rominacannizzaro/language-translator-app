@@ -12,7 +12,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 // const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
 
 // Available-to-all function to make HTTP call to our server, make a translation request and receive it
-const translateText = async ({
+const translatePublicText = async ({
   inputLang,
   outputLang,
   inputText,
@@ -110,7 +110,7 @@ export default function Home() {
         onSubmit={async (event) => {
           event.preventDefault();
           // console.log({inputText, inputLang, outputLang});
-          const result = await translateText({
+          const result = await translatePublicText({
             inputText,
             inputLang,
             outputLang,
