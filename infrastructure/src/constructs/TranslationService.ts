@@ -88,6 +88,7 @@ export class TranslationService extends Construct {
 
     // Add translateLambda to Rest API
     restApi.addTranslateMethod({
+      resource: restApi.userResource,
       httpMethod: "POST",
       lambda: translateLambda,
       isAuth: true,
@@ -108,9 +109,30 @@ export class TranslationService extends Construct {
 
     // Add getTranslationsLambda to the Rest API
     restApi.addTranslateMethod({
+      resource: restApi.userResource,
       httpMethod: "GET",
       lambda: getTranslationsLambda,
       isAuth: true,
+    });
+
+    const publicTranslateLambda = createNodeJsLambda(
+      this,
+      "publicTranslateLambda",
+      {
+        lambdaRelativePath: "translate/index.ts",
+        handler: "publicTranslate",
+        initialPolicy: [translateTablePolicy],
+        lambdaLayers: [utilsLambdaLayer],
+        environment,
+      }
+    );
+
+    // Add publicTranslateLambda to the Rest API
+    restApi.addTranslateMethod({
+      resource: restApi.publicResource,
+      httpMethod: "POST",
+      lambda: publicTranslateLambda,
+      isAuth: false,
     });
   }
 }

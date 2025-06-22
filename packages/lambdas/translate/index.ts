@@ -50,6 +50,51 @@ const getUsername = (event: lambda.APIGatewayProxyEvent) => {
   return username;
 };
 
+// Lambda handler for public translation requests without requiring user authentication
+export const publicTranslate: lambda.APIGatewayProxyHandler = async function (
+  event: lambda.APIGatewayProxyEvent,
+  context: lambda.Context
+) {
+  try {
+    if (!event.body) {
+      throw new exception.MissingBodyData();
+    }
+
+    const body = JSON.parse(event.body) as TranslateRequest; // the translate object that comes in into the lambda
+
+    if (!body.sourceLang) {
+      throw new exception.MissingParameters("sourceLang");
+    }
+    if (!body.targetLang) {
+      throw new exception.MissingParameters("targetLang");
+    }
+    if (!body.sourceText) {
+      throw new exception.MissingParameters("sourceText");
+    }
+
+    // Get current time in human-readable format
+    const now = new Date(Date.now()).toString();
+
+    // Wait for translation
+    const result = await getTranslation(body);
+
+    if (!result.TranslatedText) {
+      throw new exception.MissingParameters("TranslationText");
+    }
+
+    // Object for the response
+    const rtnData: TranslateResponse = {
+      timestamp: now,
+      targetText: result.TranslatedText,
+    };
+
+    return gateway.createSuccessJsonResponse(rtnData);
+  } catch (e: any) {
+    console.error(e);
+    return gateway.createErrorJsonResponse(e);
+  }
+};
+
 export const userTranslate: lambda.APIGatewayProxyHandler = async function (
   event: lambda.APIGatewayProxyEvent,
   context: lambda.Context
