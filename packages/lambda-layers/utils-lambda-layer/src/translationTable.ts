@@ -1,6 +1,6 @@
 import * as dynamodb from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import { TranslateResult } from "@translator/shared-types";
+import { TranslatePrimaryKey, TranslateResult } from "@translator/shared-types";
 
 export class TranslationTable {
   tableName: string;
@@ -37,7 +37,7 @@ export class TranslationTable {
   }
 
   // Query all translations for a given username (partition key is username)
-  async query({ username }: { username: string }) {
+  async query({ username }: TranslatePrimaryKey) {
     // QueryCommand input
     const queryCommand: dynamodb.QueryCommandInput = {
       TableName: this.tableName,
@@ -66,13 +66,7 @@ export class TranslationTable {
   }
 
   // Delete a translation by username and requestId, then returns remaining translations for this user
-  async delete({
-    username,
-    requestId,
-  }: {
-    username: string;
-    requestId: string;
-  }) {
+  async delete({ username, requestId }: TranslatePrimaryKey) {
     // Prepare input for DynamoDB DeleteItemCommand
     const deleteCommand: dynamodb.DeleteItemCommandInput = {
       TableName: this.tableName,
@@ -87,7 +81,7 @@ export class TranslationTable {
       new dynamodb.DeleteItemCommand(deleteCommand)
     );
     // After deletion, query for remaining items for the given username and return the result
-    return this.query({ username });
+    return this.query({ username, requestId: "" });
   }
 
   // Get all translation records
