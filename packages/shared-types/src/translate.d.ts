@@ -11,11 +11,14 @@ export type TranslateResponse = {
   targetText: string;
 };
 
+export type TranslatePrimaryKey = {
+  username: string;
+  requestId: string;
+};
+
 // Type that represents the data to be stored in the database
 export type TranslateResult = TranslateRequest &
-  TranslateResponse & {
-    username: string;
-    requestId: string;
-  };
+  TranslateResponse &
+  TranslatePrimaryKey;
 
 export type TranslateResultList = Array<TranslateResult>;
