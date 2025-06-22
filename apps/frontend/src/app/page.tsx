@@ -6,7 +6,7 @@ import {
   TranslateRequest,
   TranslateResponse,
 } from "@translator/shared-types";
-import { fetchAuthSession } from "aws-amplify/auth";
+import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 
 // API Gateway URL (add the actual URL below)
 // const URL = "https://your-api-id.execute-api.region.amazonaws.com/prod";
@@ -109,12 +109,28 @@ export default function Home() {
         className="flex flex-col space y-4"
         onSubmit={async (event) => {
           event.preventDefault();
-          // console.log({inputText, inputLang, outputLang});
-          const result = await translatePublicText({
-            inputText,
-            inputLang,
-            outputLang,
-          });
+          let result = null;
+
+          try {
+            // Route the translation request to the public or authenticated endpoint based on user being logged in or not
+            const user = await getCurrentUser();
+            if (user) {
+              result = await translateUsersText({
+                inputText,
+                inputLang,
+                outputLang,
+              });
+            } else {
+              throw new Error("User is not logged in.");
+            }
+          } catch (e) {
+            result = await translatePublicText({
+              inputText,
+              inputLang,
+              outputLang,
+            });
+          }
+          console.log("result: ", result);
           setOutputText(result);
         }}
       >
