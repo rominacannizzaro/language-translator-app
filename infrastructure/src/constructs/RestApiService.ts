@@ -71,10 +71,12 @@ export class RestApiService extends Construct {
   }
 
   addTranslateMethod({
+    resource,
     httpMethod,
     lambda,
     isAuth,
   }: {
+    resource: apigateway.Resource;
     httpMethod: string;
     lambda: lambda.IFunction;
     isAuth?: boolean;
@@ -90,7 +92,10 @@ export class RestApiService extends Construct {
         authorizationType: apigateway.AuthorizationType.COGNITO,
       };
     }
-    this.restApi.root.addMethod(
+
+    // Attach an HTTP method to a specific API Gateway resource (/public or /user),
+    // linking it to the Lambda function and applying optional Cognito authorization if required
+    resource.addMethod(
       httpMethod,
       new apigateway.LambdaIntegration(lambda),
       options
