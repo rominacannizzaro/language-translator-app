@@ -22,7 +22,7 @@ export class TranslationTable {
     this.dynamodbClient = new dynamodb.DynamoDBClient({});
   }
 
-  // Insert translation
+  // Store a new translation record in DynamoDB
   async insert(data: TranslateResult) {
     // Prepare PutItemCommand input
     const tableInsertCommand: dynamodb.PutItemCommandInput = {
@@ -30,13 +30,13 @@ export class TranslationTable {
       Item: marshall(data), // marshall converts the original data into a format that is suitable to be stored into DynamoDB
     };
 
-    // Execute Put Item Command Input
+    // Send PutItemCommand to DynamoDB to insert the item
     await this.dynamodbClient.send(
       new dynamodb.PutItemCommand(tableInsertCommand)
     );
   }
 
-  // Method to query translations based on the partition key (username)
+  // Query all translations for a given username (partition key is username)
   async query({ username }: { username: string }) {
     // QueryCommand input
     const queryCommand: dynamodb.QueryCommandInput = {
@@ -48,10 +48,10 @@ export class TranslationTable {
       ExpressionAttributeValues: {
         ":username": { S: username }, // Maps the placeholder ':username' to the provided username value
       },
-      ScanIndexForward: true, // Orders the query results by the sort key in ascending order (true for A-Z, 0-9)
+      ScanIndexForward: true, // Sorts results by sort key in ascending order
     };
 
-    // Execute Query Command
+    // Send query request to DynamoDB
     const { Items } = await this.dynamodbClient.send(
       new dynamodb.QueryCommand(queryCommand)
     );
@@ -65,7 +65,7 @@ export class TranslationTable {
     return rtnData;
   }
 
-  // Delete a translation item based on username and requestId
+  // Delete a translation by username and requestId, then returns remaining translations for this user
   async delete({
     username,
     requestId,
@@ -90,15 +90,14 @@ export class TranslationTable {
     return this.query({ username });
   }
 
-  // Get all translations
+  // Get all translation records
   async getAll() {
     // Scan Command Input
     const scanCommand: dynamodb.ScanCommandInput = {
       TableName: this.tableName,
     };
 
-    // Execute Scan Command Input
-    // This variable is of type dynamo.ScanCommandOutput. The property needed from is 'Items'.
+    // Execute the scan operation on the DynamoDB table
     const { Items } = await this.dynamodbClient.send(
       new dynamodb.ScanCommand(scanCommand)
     );
@@ -107,6 +106,7 @@ export class TranslationTable {
       return [];
     }
 
+    // Unmarshall each item to TranslateResult type, then return the array
     const rtnData = Items.map((item) => unmarshall(item) as TranslateResult);
 
     return rtnData;
