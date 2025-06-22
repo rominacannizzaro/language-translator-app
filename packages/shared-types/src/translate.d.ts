@@ -17,3 +17,5 @@ export type TranslateResult = TranslateRequest &
     username: string;
     requestId: string;
   };
+
+export type TranslateResultList = Array<TranslateResult>;
