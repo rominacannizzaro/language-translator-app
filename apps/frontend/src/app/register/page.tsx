@@ -28,6 +28,7 @@ function RegistrationForm({
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [password2, setPassword2] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <form
@@ -59,8 +60,8 @@ function RegistrationForm({
            */
           console.log("signUpStep:", nextStep.signUpStep);
           onStepChange(nextStep);
-        } catch (e) {
-          console.error("Registration error:", e);
+        } catch (e: any) {
+          setError(e.toString());
         }
       }}
     >
@@ -104,6 +105,7 @@ function RegistrationForm({
       <Link className="hover:underline" href="/user">
         Log in
       </Link>
+      {error && <p className="text-red-600 font-bold">{error}</p>}
     </form>
   );
 }
