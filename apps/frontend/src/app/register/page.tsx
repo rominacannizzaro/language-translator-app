@@ -60,8 +60,15 @@ function RegistrationForm({
            */
           console.log("signUpStep:", nextStep.signUpStep);
           onStepChange(nextStep);
-        } catch (e: any) {
-          setError(e.toString());
+        } catch (e: unknown) {
+          // Check if 'e' is an instance of the standard Error object
+          if (e instanceof Error) {
+            setError(e.message); // If it's an Error, use its 'message' property
+          } else {
+            // If it's not an Error (could be a string, number, or other object),
+            // safely convert it to a string
+            setError(String(e));
+          }
         }
       }}
     >

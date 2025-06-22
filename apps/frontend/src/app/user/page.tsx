@@ -27,8 +27,9 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
           });
           //Once signin is done, call onSignedIn()
           onSignedIn();
-        } catch (e: any) {
-          setError(e.toString());
+        } catch (e: unknown) {
+          // Safely extract error message or convert to string
+          setError(e instanceof Error ? e.message : String(e));
         }
       }}
     >
