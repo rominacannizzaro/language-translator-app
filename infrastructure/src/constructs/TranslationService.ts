@@ -121,7 +121,7 @@ export class TranslationService extends Construct {
       {
         lambdaRelativePath: "translate/index.ts",
         handler: "publicTranslate",
-        initialPolicy: [translateTablePolicy],
+        initialPolicy: [translateServicePolicy],
         lambdaLayers: [utilsLambdaLayer],
         environment,
       }
