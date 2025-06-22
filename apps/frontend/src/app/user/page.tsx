@@ -86,8 +86,7 @@ export default function User() {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-      } catch (e) {
-        console.error(e);
+      } catch {
         setUser(null);
       }
     }
