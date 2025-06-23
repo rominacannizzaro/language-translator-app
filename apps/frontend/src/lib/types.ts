@@ -10,8 +10,14 @@ export type RegisterFormData = {
   password2: string;
 };
 
-// New type for register confirmation data
+// Type for register confirmation data
 export type RegisterConfirmation = {
   email: string;
   verificationCode: string;
+};
+
+// Type for Login form data
+export type LoginFormData = {
+  email: string;
+  password: string;
 };
