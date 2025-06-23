@@ -1,21 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslate } from "@/hooks";
+import { TranslateRequestForm } from "@/components";
 
 export default function Home() {
-  const [inputText, setInputText] = useState<string>("");
-  const [inputLang, setInputLang] = useState<string>("");
-  const [outputLang, setOutputLang] = useState<string>("");
-
-  const {
-    isLoading,
-    translations,
-    translate,
-    isTranslating,
-    deleteTranslation,
-    isDeleting,
-  } = useTranslate();
+  const { isLoading, translations, deleteTranslation, isDeleting } =
+    useTranslate();
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -23,54 +13,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col m-8">
-      <form
-        className="flex flex-col space y-4"
-        onSubmit={async (event) => {
-          event.preventDefault();
-          let result = await translate({
-            sourceLang: inputLang,
-            targetLang: outputLang,
-            sourceText: inputText,
-          });
-
-          console.log("result: ", result);
-        }}
-      >
-        <div>
-          <label htmlFor="inputText">Input text</label>
-          <textarea
-            id="inputText"
-            className="bg-white"
-            value={inputText}
-            onChange={(event) => setInputText(event.target.value)}
-          />
-        </div>
-
-        <div className="my-1">
-          <label htmlFor="inputLang">Input language</label>
-          <input
-            id="inputLang"
-            className="bg-white"
-            value={inputLang}
-            onChange={(event) => setInputLang(event.target.value)}
-          />
-        </div>
-
-        <div className="my-1">
-          <label htmlFor="outputLang">Output language</label>
-          <input
-            id="outputLang"
-            className="bg-white"
-            value={outputLang}
-            onChange={(event) => setOutputLang(event.target.value)}
-          />
-        </div>
-
-        <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
-          Translate
-        </button>
-      </form>
-
+      <TranslateRequestForm />
       <div className="flex flex-col space-y-1 p-1">
         {translations.map((item) => (
           <div
