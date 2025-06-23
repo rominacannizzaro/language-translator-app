@@ -8,14 +8,13 @@ import {
   TranslatePrimaryKey,
   TranslateRequest,
 } from "@translator/shared-types";
-import { emptyPromise } from "@/lib/helpers";
 
 export const useTranslate = () => {
   const [user, setUser] = useState<AuthUser | null | undefined>(undefined);
   const queryClient = useQueryClient();
   const queryKey = ["translate", user ? user.userId : ""];
 
-  // Detect if there is user is logged in
+  // Detect if a user is logged in
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -50,15 +49,40 @@ export const useTranslate = () => {
         return translateApi.translatePublicText(request);
       }
     },
+    onSuccess: (result) => {
+      // If there is existing translation data, append the result (the new translation made) to the existing data that is cached
+      if (translateQuery.data) {
+        queryClient.setQueryData(
+          queryKey,
+          translateQuery.data.concat([result])
+        );
+      }
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (key: TranslatePrimaryKey) => {
       if (!user) {
-        return emptyPromise;
+        throw new Error("User is not logged in");
       }
 
       return translateApi.deleteUserTranslation(key);
+    },
+    onSuccess: (result) => {
+      if (!translateQuery.data) {
+        return;
+      }
+
+      // Find the index of the item being deleted
+      const index = translateQuery.data.findIndex(
+        (translationItem) => translationItem.requestId === result.requestId
+      );
+
+      // Remove the deleted item from the cached data
+      const copyData = [...translateQuery.data];
+      copyData.splice(index, 1);
+
+      queryClient.setQueryData(queryKey, copyData); // update the cached data with the modified list
     },
   });
 
