@@ -14,19 +14,23 @@ export const useUser = () => {
   // Detect if a user is logged in
   useEffect(() => {
     async function fetchUser() {
-      try {
-        setBusy(true);
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      } catch {
-        setUser(null);
-      } finally {
-        setBusy(false);
-      }
+      setBusy(true);
+      await getUser();
+      setBusy(false);
     }
 
     fetchUser();
   }, []);
+
+  // Fetches the current authenticated user and updates the user state
+  const getUser = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch {
+      setUser(null);
+    }
+  };
 
   // Logs in the user using Amplify Auth signIn, and updates 'busy' state during the process.
   // Centralizes login logic so it can be reused across the app (e.g. by LoginForm).
@@ -42,6 +46,7 @@ export const useUser = () => {
           },
         },
       });
+      await getUser(); // after signing in, set user
     } catch (e) {
       console.error(e);
     } finally {
