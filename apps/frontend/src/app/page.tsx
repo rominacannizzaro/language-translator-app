@@ -12,7 +12,7 @@ export default function Home() {
   const [outputText, setOutputText] = useState<TranslateResponse | null>(null);
   // const [translations, setTranslations] = useState<Array<TranslateResult>>([]);
 
-  const { isLoading, translations } = useTranslate();
+  const { isLoading, translations, translate, isTranslating } = useTranslate();
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -24,29 +24,13 @@ export default function Home() {
         className="flex flex-col space y-4"
         onSubmit={async (event) => {
           event.preventDefault();
-          let result = null;
+          let result = await translate({
+            sourceLang: inputLang,
+            targetLang: outputLang,
+            sourceText: inputText,
+          });
 
-          // try {
-          //   // Route the translation request to the public or authenticated endpoint based on user being logged in or not
-          //   const user = await getCurrentUser();
-          //   if (user) {
-          //     result = await translateUsersText({
-          //       inputText,
-          //       inputLang,
-          //       outputLang,
-          //     });
-          //   } else {
-          //     throw new Error("User is not logged in.");
-          //   }
-          // } catch {
-          //   result = await translatePublicText({
-          //     inputText,
-          //     inputLang,
-          //     outputLang,
-          //   });
-          // }
           console.log("result: ", result);
-          setOutputText(result);
         }}
       >
         <div>
