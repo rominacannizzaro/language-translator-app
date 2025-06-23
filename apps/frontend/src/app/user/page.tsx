@@ -1,71 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getCurrentUser, signIn, signOut } from "aws-amplify/auth";
-
-// Log in component
-function Login({ onSignedIn }: { onSignedIn: () => void }) {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-
-  return (
-    <form
-      className="flex flex-col space-y-4"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        try {
-          await signIn({
-            username: email,
-            password,
-            options: {
-              userAttributes: {
-                email,
-              },
-            },
-          });
-          //Once signin is done, call onSignedIn()
-          onSignedIn();
-        } catch (e: unknown) {
-          // Safely extract error message or convert to string
-          setError(e instanceof Error ? e.message : String(e));
-        }
-      }}
-    >
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          id="email"
-          type="email"
-          className="bg-white"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input
-          id="password"
-          type="password"
-          className="bg-white"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-
-      <button className="btn bg-blue-500" type="submit">
-        Log in
-      </button>
-
-      <Link className="hover:underline" href="/register">
-        Register
-      </Link>
-      {error && <p className="text-red-600 font-bold">{error}</p>}
-    </form>
-  );
-}
+import { getCurrentUser, signOut } from "aws-amplify/auth";
+import { LoginForm } from "@/components";
 
 // Log out component
 function Logout({ onSignedOut }: { onSignedOut: () => void }) {
@@ -116,7 +53,7 @@ export default function User() {
   }
 
   return (
-    <Login
+    <LoginForm
       onSignedIn={async () => {
         const currentUser = await getCurrentUser();
         setUser(currentUser); // Once logging in is done, we get the current user, we set the user and, once user is set, Log out option will be shown to the user
