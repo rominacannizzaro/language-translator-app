@@ -1,9 +1,11 @@
+"use client";
+
 import { AuthUserType } from "@/lib";
 import React, { useContext, createContext, useState } from "react";
 
 type AppContextType = {
   user: AuthUserType | null | undefined; // 3 possible states for user - 'Undefined': on loading, user status is still unknown/checking. 'Null': not logged in. 'AuthUser': logged in.
-  setUser: (user: AuthUserType) => void;
+  setUser: (user: AuthUserType | null) => void;
 };
 
 const AppContext = createContext<AppContextType>({
