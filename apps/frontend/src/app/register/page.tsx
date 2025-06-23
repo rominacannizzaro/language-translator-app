@@ -1,71 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { confirmSignUp, autoSignIn } from "aws-amplify/auth";
+import { autoSignIn } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
 import { SignInStateType, SignUpStateType } from "@/lib";
-import { RegistrationForm } from "@/components";
-
-/**
- * Renders the confirmation form for user email verification.
- * This component prompts the user to enter the verification code received via email
- * to confirm their newly created account in Cognito.
- * It uses `aws-amplify/auth.confirmSignUp` to complete the verification process.
- */
-function ConfirmSignUp({
-  onStepChange,
-}: {
-  onStepChange: (step: SignUpStateType) => void;
-}) {
-  const [verificationCode, setVerificationCode] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-
-  return (
-    <form
-      className="flex flex-col space-y-4"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        try {
-          const { nextStep } = await confirmSignUp({
-            confirmationCode: verificationCode,
-            username: email,
-          });
-
-          console.log("signUpStep:", nextStep.signUpStep);
-          onStepChange(nextStep);
-        } catch (e) {
-          console.error("Confirmation error:", e);
-        }
-      }}
-    >
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          id="email"
-          type="email"
-          className="bg-white"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="verificationCode">Verification code:</label>
-        <input
-          id="verificationCode"
-          type="text"
-          className="bg-white"
-          value={verificationCode}
-          onChange={(e) => setVerificationCode(e.target.value)}
-        />
-      </div>
-
-      <button className="btn bg-blue-500" type="submit">
-        Confirm
-      </button>
-    </form>
-  );
-}
+import { ConfirmSignUp, RegistrationForm } from "@/components";
 
 /**
  * Attempts to automatically sign in the user.
