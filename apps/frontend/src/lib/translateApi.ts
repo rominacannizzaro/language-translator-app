@@ -3,6 +3,7 @@ import {
   TranslateResponse,
   TranslatePrimaryKey,
   TranslateResultList,
+  TranslateResult,
 } from "@translator/shared-types";
 import { fetchAuthSession } from "aws-amplify/auth";
 
@@ -17,7 +18,7 @@ export const translatePublicText = async (request: TranslateRequest) => {
       body: JSON.stringify(request),
     });
 
-    const rtnValue = (await result.json()) as TranslateResponse;
+    const rtnValue = (await result.json()) as TranslateResult;
     return rtnValue;
   } catch (e: unknown) {
     console.error(e);
@@ -38,7 +39,7 @@ export const translateUsersText = async (request: TranslateRequest) => {
       },
     });
 
-    const rtnValue = (await result.json()) as TranslateResponse;
+    const rtnValue = (await result.json()) as TranslateResult;
     return rtnValue;
   } catch (e: unknown) {
     console.error(e);
