@@ -74,18 +74,6 @@ export default function Home() {
           {JSON.stringify(outputText)}
         </pre>
       </div>
-
-      {/* <button
-        className="btn bg-blue-500"
-        type="button"
-        onClick={async () => {
-          const rtnValue = await getUsersTranslations();
-          setTranslations(rtnValue);
-        }}
-      >
-        Get translations
-      </button> */}
-
       <div className="flex flex-col space-y-1 p-1">
         {translations.map((item) => (
           <div
