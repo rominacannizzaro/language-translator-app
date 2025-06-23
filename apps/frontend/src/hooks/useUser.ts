@@ -1,7 +1,8 @@
 "use client";
 
 import { useApp } from "@/components";
-import { getCurrentUser } from "aws-amplify/auth";
+import { LoginFormData } from "@/lib";
+import { signIn, getCurrentUser } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
 
 // Hook to detect and provide the current user state across the app.
@@ -27,8 +28,30 @@ export const useUser = () => {
     fetchUser();
   }, []);
 
+  // Logs in the user using Amplify Auth signIn, and updates 'busy' state during the process.
+  // Centralizes login logic so it can be reused across the app (e.g. by LoginForm).
+  const login = async ({ email, password }: LoginFormData) => {
+    try {
+      setBusy(true);
+      await signIn({
+        username: email,
+        password,
+        options: {
+          userAttributes: {
+            email,
+          },
+        },
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return {
     user,
     busy,
+    login,
   };
 };
