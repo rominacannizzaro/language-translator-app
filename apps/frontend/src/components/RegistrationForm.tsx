@@ -5,6 +5,12 @@ import { TranslateRequest } from "@translator/shared-types";
 import { RegisterFormData, SignUpStateType } from "@/lib";
 import { signUp } from "aws-amplify/auth";
 
+/**
+ * Renders the initial user registration form.
+ * Handles user input for email and passwords, performs basic client-side validation,
+ * and initiates the user signup process with AWS Amplify.
+ */
+
 export const RegistrationForm = ({
   onStepChange,
 }: {
