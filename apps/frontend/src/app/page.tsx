@@ -9,10 +9,17 @@ export default function Home() {
   const [inputText, setInputText] = useState<string>("");
   const [inputLang, setInputLang] = useState<string>("");
   const [outputLang, setOutputLang] = useState<string>("");
-  const [outputText, setOutputText] = useState<TranslateResponse | null>(null);
+  // const [outputText, setOutputText] = useState<TranslateResponse | null>(null);
   // const [translations, setTranslations] = useState<Array<TranslateResult>>([]);
 
-  const { isLoading, translations, translate, isTranslating } = useTranslate();
+  const {
+    isLoading,
+    translations,
+    translate,
+    isTranslating,
+    deleteTranslation,
+    isDeleting,
+  } = useTranslate();
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -68,12 +75,6 @@ export default function Home() {
         </button>
       </form>
 
-      <div>
-        <p>Result:</p>
-        <pre className="whitespace-pre-wrap w-full">
-          {JSON.stringify(outputText)}
-        </pre>
-      </div>
       <div className="flex flex-col space-y-1 p-1">
         {translations.map((item) => (
           <div
@@ -86,19 +87,15 @@ export default function Home() {
             <p>
               {item.targetLang} / {item.targetText}
             </p>
-            {/* <button
+            <button
               className="btn p-1 bg-red-500 hover:bg-red-300 rounded-md"
               type="button"
               onClick={async () => {
-                const rtnValue = await deleteUserTranslation({
-                  username: item.username,
-                  requestId: item.requestId,
-                });
-                setTranslations(rtnValue);
+                deleteTranslation(item);
               }}
             >
-              X
-            </button> */}
+              {isDeleting ? "..." : "X"}
+            </button>
           </div>
         ))}
       </div>

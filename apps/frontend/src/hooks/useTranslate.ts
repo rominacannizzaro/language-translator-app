@@ -4,7 +4,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateApi } from "@/lib";
 import { AuthUser, getCurrentUser } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
-import { TranslateRequest } from "@translator/shared-types";
+import {
+  TranslatePrimaryKey,
+  TranslateRequest,
+} from "@translator/shared-types";
+import { emptyPromise } from "@/lib/helpers";
 
 export const useTranslate = () => {
   const [user, setUser] = useState<AuthUser | null | undefined>(undefined);
@@ -48,10 +52,22 @@ export const useTranslate = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (key: TranslatePrimaryKey) => {
+      if (!user) {
+        return emptyPromise;
+      }
+
+      return translateApi.deleteUserTranslation(key);
+    },
+  });
+
   return {
     translations: !translateQuery.data ? [] : translateQuery.data,
     isLoading: translateQuery.status === "pending",
     translate: translateMutation.mutate,
     isTranslating: translateMutation.status === "pending",
+    deleteTranslation: deleteMutation.mutate,
+    isDeleting: deleteMutation.status === "pending",
   };
 };
