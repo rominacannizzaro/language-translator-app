@@ -61,8 +61,6 @@ export default function Register() {
     if ((step as SignUpStateType).signUpStep === "COMPLETE_AUTO_SIGN_IN") {
       return <AutoSignIn onStepChange={setStep} />;
     }
-
-    // TO-DO: Once AutoSignIn is done, page re-routing will be implemented
   }
 
   return <RegistrationForm onStepChange={setStep} />;
