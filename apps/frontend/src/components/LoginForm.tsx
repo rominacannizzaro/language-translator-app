@@ -4,7 +4,7 @@ import { LoginFormData } from "@/lib";
 import { useUser } from "@/hooks/useUser";
 
 // Login form component
-export const LoginForm = ({ onSignedIn }: { onSignedIn: () => void }) => {
+export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
   const {
     register,
     handleSubmit,
@@ -16,7 +16,7 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn: () => void }) => {
   const onSubmit: SubmitHandler<LoginFormData> = async (data, event) => {
     event && event.preventDefault();
     login(data).then(() => {
-      onSignedIn();
+      onSignedIn && onSignedIn();
     });
   };
 
