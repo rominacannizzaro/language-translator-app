@@ -14,7 +14,7 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
     formState: { errors },
   } = useForm<LoginFormData>();
 
-  const { login } = useUser();
+  const { login, busy } = useUser();
 
   const onSubmit: SubmitHandler<LoginFormData> = async (data, event) => {
     event && event.preventDefault();
@@ -51,7 +51,7 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
       </div>
 
       <Button type="submit" className="my-2">
-        {"Login"}
+        {busy ? "Logging in..." : "Login"}
       </Button>
     </form>
   );
