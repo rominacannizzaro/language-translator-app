@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslate } from "@/hooks";
-import { TranslateRequestForm } from "@/components";
+import { TranslateCard, TranslateRequestForm } from "@/components";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -20,28 +20,9 @@ export default function Home() {
     <main className="flex flex-col h-screen">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel>
-          <div className="flex flex-col bg-gray-900  w-full h-full space-y-1 p-1">
+          <div className="flex flex-col bg-gray-900  w-full h-full space-y-2 p-2">
             {translations.map((item) => (
-              <div
-                className="flex flex-row justify-between p-1 space-x-1 bg-slate-400"
-                key={item.requestId}
-              >
-                <p>
-                  {item.sourceLang} / {item.sourceText}
-                </p>
-                <p>
-                  {item.targetLang} / {item.targetText}
-                </p>
-                <button
-                  className="btn p-1 bg-red-500 hover:bg-red-300 rounded-md"
-                  type="button"
-                  onClick={async () => {
-                    deleteTranslation(item);
-                  }}
-                >
-                  {isDeleting ? "..." : "X"}
-                </button>
-              </div>
+              <TranslateCard key={item.requestId} translateItem={item} />
             ))}
           </div>
         </ResizablePanel>
