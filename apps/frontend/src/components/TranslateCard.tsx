@@ -2,9 +2,10 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { TranslateRequest, TranslateResult } from "@translator/shared-types";
+import { TranslateResult } from "@translator/shared-types";
 import { Card } from "./ui/card";
 import { cn } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
 
 export const TranslateCard = ({
   translateItem,
@@ -21,9 +22,11 @@ export const TranslateCard = ({
       )}
     >
       <div className={cn("flex flex-col text-gray-900")}>
-        <p>
-          {translateItem.sourceLang} / {translateItem.targetLang}
-        </p>
+        <div className="flex flex-row text-base font-semibold">
+          <p>{translateItem.sourceLang}</p>
+          <ArrowRight />
+          <p>{translateItem.targetLang}</p>
+        </div>
         <p>{translateItem.sourceText}</p>
         <p>{translateItem.requestId}</p>
       </div>
