@@ -47,7 +47,9 @@ export default function Home() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          <TranslateRequestForm />
+          <div className="p-4">
+            <TranslateRequestForm />
+          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
     </main>
