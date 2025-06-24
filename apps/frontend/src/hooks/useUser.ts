@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 // Centralizes user detection logic (via Amplify getCurrentUser) and updates the user state in the app context.
 export const useUser = () => {
   const [busy, setBusy] = useState<boolean>(false);
-  const { user, setUser } = useApp();
+  const { user, setUser, setError, resetError } = useApp();
 
   // Detect if a user is logged in
   useEffect(() => {
@@ -37,6 +37,7 @@ export const useUser = () => {
   const login = async ({ email, password }: LoginFormData) => {
     try {
       setBusy(true);
+      resetError();
       await signIn({
         username: email,
         password,
@@ -47,8 +48,12 @@ export const useUser = () => {
         },
       });
       await getUser(); // after signing in, set user
-    } catch (e) {
-      console.error(e);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError(String(e));
+      }
     } finally {
       setBusy(false);
     }
