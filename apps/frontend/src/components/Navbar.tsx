@@ -92,7 +92,7 @@ export const Navbar = () => {
     <div className="border-b bg-white">
       <div className="flex h-16 items-center px-4">
         <h1
-          className="font-semibold text-lg hover:underline"
+          className="font-semibold text-xl hover:underline"
           onClick={() => {
             router.push("/");
           }}
