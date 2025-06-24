@@ -2,6 +2,9 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { LoginFormData } from "@/lib";
 import { useUser } from "@/hooks/useUser";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 // Login form component
 export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
@@ -23,8 +26,8 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
   return (
     <form className="flex flex-col space y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label htmlFor="email">Email:</label>
-        <input
+        <Label htmlFor="email">Email:</Label>
+        <Input
           id="email"
           className="bg-white"
           {...register("email", { required: true })}
@@ -33,8 +36,8 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
       </div>
 
       <div className="my-1">
-        <label htmlFor="password">Password: </label>
-        <input
+        <Label htmlFor="password">Password: </Label>
+        <Input
           id="password"
           type="password"
           className="bg-white"
@@ -43,9 +46,7 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
         {errors.password && <span>Field is required</span>}
       </div>
 
-      <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
-        {"Login"}
-      </button>
+      <Button type="submit">{"Login"}</Button>
     </form>
   );
 };
