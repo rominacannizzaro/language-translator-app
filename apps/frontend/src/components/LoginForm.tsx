@@ -24,7 +24,7 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
   };
 
   return (
-    <form className="flex flex-col space y-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="my-1">
         <Label htmlFor="email" className="my-1">
           Email:
