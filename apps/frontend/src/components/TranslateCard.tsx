@@ -6,6 +6,7 @@ import { TranslateResult } from "@translator/shared-types";
 import { Card } from "./ui/card";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
+import { getDate, getTime } from "@/lib";
 
 export const TranslateCard = ({
   translateItem,
@@ -28,9 +29,11 @@ export const TranslateCard = ({
           <p>{translateItem.targetLang}</p>
         </div>
         <p>{translateItem.sourceText}</p>
-        <p>{translateItem.requestId}</p>
+        <div className="text-gray-500">
+          <p>{getDate(parseInt(translateItem.requestId))}</p>
+          <p>{getTime(parseInt(translateItem.requestId))}</p>
+        </div>
       </div>
-
       {/* <button
             className="btn p-1 bg-red-500 hover:bg-red-300 rounded-md"
             type="button"
