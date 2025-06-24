@@ -31,6 +31,7 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
         </Label>
         <Input
           id="email"
+          disabled={busy}
           className="bg-white"
           {...register("email", { required: true })}
         />
@@ -43,6 +44,7 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
         </Label>
         <Input
           id="password"
+          disabled={busy}
           type="password"
           className="bg-white"
           {...register("password", { required: true })}
