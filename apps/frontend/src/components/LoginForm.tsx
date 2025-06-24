@@ -25,8 +25,10 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
 
   return (
     <form className="flex flex-col space y-4" onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <Label htmlFor="email">Email:</Label>
+      <div className="my-1">
+        <Label htmlFor="email" className="my-1">
+          Email:
+        </Label>
         <Input
           id="email"
           className="bg-white"
@@ -36,7 +38,9 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
       </div>
 
       <div className="my-1">
-        <Label htmlFor="password">Password: </Label>
+        <Label htmlFor="password" className="my-1">
+          Password:
+        </Label>
         <Input
           id="password"
           type="password"
@@ -46,7 +50,9 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
         {errors.password && <span>Field is required</span>}
       </div>
 
-      <Button type="submit">{"Login"}</Button>
+      <Button type="submit" className="my-2">
+        {"Login"}
+      </Button>
     </form>
   );
 };

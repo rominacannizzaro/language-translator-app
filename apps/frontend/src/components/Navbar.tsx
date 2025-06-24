@@ -60,10 +60,12 @@ export function UserNav() {
           <DropdownMenuGroup>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Login</p>
+                <p className="text-base font-bold leading-none">Login</p>
               </div>
             </DropdownMenuLabel>
-            <LoginForm />
+            <div className="pt-2 px-2">
+              <LoginForm />
+            </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
