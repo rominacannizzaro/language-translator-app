@@ -16,9 +16,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks";
+import { LoginForm } from "./LoginForm";
 
 export function UserNav() {
   const { user, logout } = useUser();
+  const router = useRouter();
 
   return (
     <DropdownMenu>
@@ -51,6 +53,24 @@ export function UserNav() {
             >
               Log out
               <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        )}
+        {!user && (
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">Login</p>
+              </div>
+            </DropdownMenuLabel>
+            <LoginForm />
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                router.push("/register");
+              }}
+            >
+              Register
             </DropdownMenuItem>
           </DropdownMenuGroup>
         )}
