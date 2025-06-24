@@ -19,7 +19,7 @@ import { useUser } from "@/hooks";
 import { LoginForm } from "./LoginForm";
 
 export function UserNav() {
-  const { user, logout } = useUser();
+  const { user, logout, busy } = useUser();
   const router = useRouter();
 
   return (
@@ -51,12 +51,12 @@ export function UserNav() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
+              className="text-base font-bold leading-none justify-center"
               onClick={() => {
                 logout();
               }}
             >
-              Log out
-              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+              {busy ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         )}
