@@ -2,6 +2,10 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useTranslate } from "@/hooks";
 import { TranslateRequest } from "@translator/shared-types";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
 
 export const TranslateRequestForm = () => {
   const { translate, isTranslating } = useTranslate();
@@ -18,10 +22,10 @@ export const TranslateRequestForm = () => {
   };
 
   return (
-    <form className="flex flex-col space y-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label htmlFor="sourceText">Input text</label>
-        <textarea
+        <Label htmlFor="sourceText">Input text</Label>
+        <Textarea
           id="sourceText"
           className="bg-white"
           {...register("sourceText", { required: true })}
@@ -30,8 +34,8 @@ export const TranslateRequestForm = () => {
       </div>
 
       <div className="my-1">
-        <label htmlFor="sourceLang">Input language</label>
-        <input
+        <Label htmlFor="sourceLang">Input language</Label>
+        <Input
           id="sourceLang"
           className="bg-white"
           {...register("sourceLang", { required: true })}
@@ -40,8 +44,8 @@ export const TranslateRequestForm = () => {
       </div>
 
       <div className="my-1">
-        <label htmlFor="targetLang">Output language</label>
-        <input
+        <Label htmlFor="targetLang">Output language</Label>
+        <Input
           id="targetLang"
           className="bg-white"
           {...register("targetLang", { required: true })}
@@ -49,9 +53,9 @@ export const TranslateRequestForm = () => {
         {errors.targetLang && <span>Field is required</span>}
       </div>
 
-      <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
+      <Button className="font-bold" type="submit">
         {isTranslating ? "Translating..." : "Translate"}
-      </button>
+      </Button>
     </form>
   );
 };
