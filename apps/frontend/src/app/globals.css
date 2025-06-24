@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 body {
-  background: #adadad;
+  background: #f3f4f6;
 }
 
 @theme inline {
@@ -122,4 +122,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-  
