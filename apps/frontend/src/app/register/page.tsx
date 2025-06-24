@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { autoSignIn } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
 import { SignInStateType, SignUpStateType } from "@/lib";
 import { ConfirmSignUp, RegistrationForm } from "@/components";
+import { useUser } from "@/hooks";
 
 /**
  * Attempts to automatically sign in the user.
- * This component is rendered after a successful sign-up and email confirmation,
- * especially when the `autoSignIn: true` option was used during the initial `signUp` call.
+ * This component is rendered when the sign-up flow reaches the 'COMPLETE_AUTO_SIGN_IN' step,
+ * which typically occurs after email confirmation (if required) when `autoSignIn: true` was used during sign-up.
  * It uses a `useEffect` hook to trigger the auto-sign-in process immediately upon mounting.
  */
 function AutoSignIn({
@@ -17,20 +17,21 @@ function AutoSignIn({
 }: {
   onStepChange: (step: SignInStateType) => void;
 }) {
-  useEffect(() => {
-    const asyncSignIn = async () => {
-      const { nextStep } = await autoSignIn();
-      console.log("nextStep from AutoSignIn:", nextStep);
-      onStepChange(nextStep);
-    };
+  const { autoLogin } = useUser();
 
-    asyncSignIn();
+  useEffect(() => {
+    autoLogin().then((nextStep) => {
+      if (nextStep) {
+        console.log("nextStep from AutoSignIn:", nextStep);
+        onStepChange(nextStep);
+      }
+    });
   }, []);
   return <div>Signing in...</div>;
 }
 
 /**
- * Render different components based on the registration flow state:
+ * Renders different components based on the registration flow state:
  * 1. Show registration form initially
  * 2. After registration, show confirmation form to enter verification code
  * 3. After successful confirmation, auto sign-in and redirect authenticated user
@@ -41,11 +42,10 @@ export default function Register() {
     null
   );
 
-  // useEffect that monitors the state of the step
+  // Once a sign-in step is detected as "DONE", redirect the user to the homepage
   useEffect(() => {
     if (!step) return;
 
-    // If sign in was done, route to home page
     if ((step as SignInStateType).signInStep === "DONE") {
       router.push("./");
     }

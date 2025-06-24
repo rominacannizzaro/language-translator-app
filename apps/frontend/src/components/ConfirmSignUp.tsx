@@ -1,13 +1,15 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { RegisterConfirmation, SignUpStateType } from "@/lib";
-import { confirmSignUp } from "aws-amplify/auth";
+import { useUser } from "@/hooks";
 
 /**
  * Renders the confirmation form for user email verification.
  * This component prompts the user to enter the verification code received via email
  * to confirm their newly created account in Cognito.
- * It uses `aws-amplify/auth.confirmSignUp` to complete the verification process.
+ *
+ * It calls the confirmRegister function from useUser,
+ * which internally uses aws-amplify/auth.confirmSignUp to complete the verification process.
  */
 export const ConfirmSignUp = ({
   onStepChange,
@@ -20,28 +22,20 @@ export const ConfirmSignUp = ({
     formState: { errors },
   } = useForm<RegisterConfirmation>();
 
-  const onSubmit: SubmitHandler<RegisterConfirmation> = async (
-    { email, verificationCode },
-    event
-  ) => {
+  const { confirmRegister } = useUser();
+
+  const onSubmit: SubmitHandler<RegisterConfirmation> = async (data, event) => {
     event && event.preventDefault();
-
-    try {
-      console.log("on confirm called");
-      const { nextStep } = await confirmSignUp({
-        confirmationCode: verificationCode,
-        username: email,
-      });
-
-      console.log("signUpStep:", nextStep.signUpStep);
-      onStepChange(nextStep);
-    } catch (e) {
-      console.error("Confirmation error:", e);
-    }
+    confirmRegister(data).then((nextStep) => {
+      if (nextStep) {
+        console.log("signUpStep:", nextStep.signUpStep);
+        onStepChange(nextStep); // move to the next step
+      }
+    });
   };
 
   return (
-    <form className="flex flex-col space y-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
         <label htmlFor="email">Email:</label>
         <input
