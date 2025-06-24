@@ -84,6 +84,7 @@ export const useUser = () => {
       setBusy(true);
       resetError();
       await signOut();
+      setUser(null);
     } catch (e: unknown) {
       if (e instanceof Error) {
         setError(e.message);
