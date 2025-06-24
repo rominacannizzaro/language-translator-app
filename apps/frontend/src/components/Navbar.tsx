@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks";
 
 export function UserNav() {
-  const { user } = useUser();
+  const { user, logout } = useUser();
 
   return (
     <DropdownMenu>
@@ -35,14 +35,20 @@ export function UserNav() {
           <DropdownMenuGroup>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">shadcn</p>
+                <p className="text-sm font-medium leading-none">
+                  {user.signInDetails?.loginId}
+                </p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  m@example.com
+                  {user.username}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                logout();
+              }}
+            >
               Log out
               <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
             </DropdownMenuItem>
