@@ -79,7 +79,7 @@ export const useUser = () => {
     }
   }, []);
 
-  const logout = useCallback(async ({ email, password }: LoginFormData) => {
+  const logout = useCallback(async () => {
     try {
       setBusy(true);
       resetError();
