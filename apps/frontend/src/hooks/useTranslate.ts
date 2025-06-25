@@ -7,9 +7,12 @@ import {
   TranslateRequest,
 } from "@translator/shared-types";
 import { useUser } from "./useUser";
+import { useApp } from "@/components";
 
 export const useTranslate = () => {
   const { user } = useUser();
+  const { setError } = useApp();
+
   const queryClient = useQueryClient();
   const queryKey = ["translate", user ? user.userId : ""];
 
@@ -42,6 +45,9 @@ export const useTranslate = () => {
           translateQuery.data.concat([result])
         );
       }
+    },
+    onError: (e) => {
+      setError(e.toString());
     },
   });
 
