@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthUserType } from "@/lib";
+import { TranslateResult } from "@translator/shared-types";
 import React, { useContext, createContext, useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +10,8 @@ type AppContextType = {
   setUser: (user: AuthUserType | null) => void;
   setError: (msg: string) => void;
   resetError: () => void;
+  selectedTranslation: TranslateResult | null;
+  setSelectedTranslation: (item: TranslateResult) => void;
 };
 
 const AppContext = createContext<AppContextType>({
@@ -16,9 +19,13 @@ const AppContext = createContext<AppContextType>({
   setUser: (user) => {},
   setError: (msg) => {},
   resetError: () => {},
+  selectedTranslation: null,
+  setSelectedTranslation: (item: TranslateResult) => {},
 });
 
 function useInitalApp(): AppContextType {
+  const [selectedTranslation, setSelectedTranslation] =
+    useState<TranslateResult | null>(null);
   const [user, setUser] = useState<AuthUserType | null | undefined>(undefined);
 
   return {
@@ -36,6 +43,8 @@ function useInitalApp(): AppContextType {
     resetError: () => {
       toast.dismiss();
     },
+    selectedTranslation,
+    setSelectedTranslation,
   };
 }
 

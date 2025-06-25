@@ -10,17 +10,23 @@ import { Button } from "./ui/button";
 import { useTranslate } from "@/hooks";
 
 export const TranslateCard = ({
+  isSelected,
+  onSelected,
   translateItem,
 }: {
+  isSelected: boolean;
+  onSelected: (item: TranslateResult) => void;
   translateItem: TranslateResult;
 }) => {
   const { deleteTranslation, isDeleting } = useTranslate();
 
   return (
     <Card
+      onClick={() => onSelected(translateItem)}
       className={cn(
         "flex flex-row items-center justify-between px-4 py-2 space-x-1 border-0",
-        "bg-gray-50 hover:bg-blue-200 cursor-pointer"
+        "bg-gray-50 hover:bg-blue-200 cursor-pointer",
+        isSelected && "bg-blue-400 hover:bg-blue-500"
       )}
     >
       <div className={cn("flex flex-col text-gray-900")}>
