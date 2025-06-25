@@ -2,6 +2,9 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useUser } from "@/hooks";
 import { RegisterFormData, SignUpStateType } from "@/lib";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 /**
  * Renders the initial user registration form.
@@ -19,7 +22,7 @@ export const RegistrationForm = ({
     formState: { errors },
   } = useForm<RegisterFormData>();
 
-  const { register: accountRegister } = useUser();
+  const { busy, register: accountRegister } = useUser();
 
   const onSubmit: SubmitHandler<RegisterFormData> = async (data, event) => {
     event && event.preventDefault();
@@ -42,9 +45,10 @@ export const RegistrationForm = ({
   return (
     <form className="flex flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label htmlFor="email">Email:</label>
-        <input
+        <Label htmlFor="email">Email:</Label>
+        <Input
           id="email"
+          disabled={busy}
           className="bg-white"
           {...register("email", { required: true })}
         />
@@ -52,10 +56,11 @@ export const RegistrationForm = ({
       </div>
 
       <div className="my-1">
-        <label htmlFor="password">Password: </label>
-        <input
+        <Label htmlFor="password">Password: </Label>
+        <Input
           id="password"
           type="password"
+          disabled={busy}
           className="bg-white"
           {...register("password", { required: true })}
         />
@@ -63,19 +68,18 @@ export const RegistrationForm = ({
       </div>
 
       <div className="my-1">
-        <label htmlFor="password2">Retype password: </label>
-        <input
+        <Label htmlFor="password2">Retype password: </Label>
+        <Input
           id="password2"
           type="password"
+          disabled={busy}
           className="bg-white"
           {...register("password2", { required: true })}
         />
         {errors.password2 && <span>Field is required</span>}
       </div>
 
-      <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
-        {"Register"}
-      </button>
+      <Button type="submit">Register</Button>
     </form>
   );
 };
