@@ -97,7 +97,7 @@ export const Navbar = () => {
             router.push("/");
           }}
         >
-          Translator App
+          Translator App (by Romina C.)
         </h1>
         <div className="ml-auto flex items-center space-x-4">
           <UserNav />
