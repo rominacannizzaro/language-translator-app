@@ -18,8 +18,13 @@ export const translatePublicText = async (request: TranslateRequest) => {
       body: JSON.stringify(request),
     });
 
-    const rtnValue = (await result.json()) as TranslateResult;
-    return rtnValue;
+    const rtnValue = (await result.json()) as TranslateResult | string;
+
+    if (!result.ok) {
+      throw new Error(rtnValue as string);
+    }
+
+    return rtnValue as TranslateResult;
   } catch (e: unknown) {
     console.error(e);
     throw e;
@@ -39,8 +44,13 @@ export const translateUsersText = async (request: TranslateRequest) => {
       },
     });
 
-    const rtnValue = (await result.json()) as TranslateResult;
-    return rtnValue;
+    const rtnValue = (await result.json()) as TranslateResult | string;
+
+    if (!result.ok) {
+      throw new Error(rtnValue as string);
+    }
+
+    return rtnValue as TranslateResult;
   } catch (e: unknown) {
     console.error(e);
     throw e;
