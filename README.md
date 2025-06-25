@@ -1,5 +1,7 @@
 This is an application developed using Next.js, TypeScript, TailwindCSS and AWS Cloud Platform (using AWS services such as Lambda, API Gateway, DynamoDB, Cognito, Amplify).
 
+Demo: https://www.language-translator-rcsoftdev.com/
+
 ## Description
 
 This is a language translation app that allows users to translate text between languages and optionally keep track of past translations.
