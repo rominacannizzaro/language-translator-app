@@ -5,7 +5,6 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useTranslate } from "@/hooks";
 import { TranslateRequest } from "@translator/shared-types";
 import { Label } from "./ui/label";
-import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { useApp } from "./AppProvider";
