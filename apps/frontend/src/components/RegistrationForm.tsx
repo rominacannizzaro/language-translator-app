@@ -55,7 +55,7 @@ export const RegistrationForm = ({
         {errors.email && <span>Field is required</span>}
       </div>
 
-      <div className="my-1">
+      <div>
         <Label htmlFor="password">Password: </Label>
         <Input
           id="password"
@@ -67,7 +67,7 @@ export const RegistrationForm = ({
         {errors.password && <span>Field is required</span>}
       </div>
 
-      <div className="my-1">
+      <div>
         <Label htmlFor="password2">Retype password: </Label>
         <Input
           id="password2"
@@ -79,7 +79,9 @@ export const RegistrationForm = ({
         {errors.password2 && <span>Field is required</span>}
       </div>
 
-      <Button type="submit">Register</Button>
+      <Button contentEditable={false} type="submit" className="my-3">
+        Register
+      </Button>
     </form>
   );
 };

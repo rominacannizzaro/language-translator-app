@@ -72,6 +72,7 @@ export function UserNav() {
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem
+              className="justify-center"
               onClick={() => {
                 router.push("/register");
               }}
