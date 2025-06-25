@@ -42,6 +42,13 @@ export const ConfirmSignUp = ({
 
   return (
     <form className="flex flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <div className="mb-5">
+        <p>We have sent a verification code to your email.</p>
+        <p>
+          Please, enter your email address and the verification code below to
+          continue:
+        </p>
+      </div>
       <div>
         <Label htmlFor="email">Email:</Label>
         <Input
