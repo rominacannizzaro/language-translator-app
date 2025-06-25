@@ -25,7 +25,9 @@ export const RegistrationForm = ({
   const { busy, register: accountRegister } = useUser();
 
   const onSubmit: SubmitHandler<RegisterFormData> = async (data, event) => {
-    event && event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
 
     /**
      *  When the register() function from useUser is called, it returns a 'nextStep' object, whose 'signUpStep' property indicates the current state of the sign-up flow.

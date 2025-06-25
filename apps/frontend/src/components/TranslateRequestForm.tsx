@@ -31,7 +31,9 @@ export const TranslateRequestForm = () => {
   }, [selectedTranslation]);
 
   const onSubmit: SubmitHandler<TranslateRequest> = (data, event) => {
-    event && event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
     translate(data);
   };
 

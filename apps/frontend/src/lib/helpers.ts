@@ -1,5 +1,3 @@
-export const emptyPromise = new Promise((resolve, reject) => {});
-
 export function getDate(time: number) {
   return new Date(time).toLocaleDateString();
 }

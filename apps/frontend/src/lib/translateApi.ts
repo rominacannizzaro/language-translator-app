@@ -1,6 +1,5 @@
 import {
   TranslateRequest,
-  TranslateResponse,
   TranslatePrimaryKey,
   TranslateResultList,
   TranslateResult,

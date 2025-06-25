@@ -28,7 +28,10 @@ export const ConfirmSignUp = ({
   const { confirmRegister, busy } = useUser();
 
   const onSubmit: SubmitHandler<RegisterConfirmation> = async (data, event) => {
-    event && event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
+
     confirmRegister(data).then((nextStep) => {
       if (nextStep) {
         console.log("signUpStep:", nextStep.signUpStep);

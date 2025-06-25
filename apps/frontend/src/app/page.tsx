@@ -12,8 +12,7 @@ import { ImperativePanelHandle } from "react-resizable-panels";
 import { LoadingPage } from "@/components/ui/loading";
 
 export default function Home() {
-  const { isLoading, translations, deleteTranslation, isDeleting } =
-    useTranslate();
+  const { isLoading, translations } = useTranslate();
   const { user, selectedTranslation, setSelectedTranslation } = useApp();
   const leftPanelRef = createRef<ImperativePanelHandle>();
 

@@ -16,11 +16,11 @@ type AppContextType = {
 
 const AppContext = createContext<AppContextType>({
   user: null,
-  setUser: (user) => {},
-  setError: (msg) => {},
+  setUser: () => {},
+  setError: () => {},
   resetError: () => {},
   selectedTranslation: null,
-  setSelectedTranslation: (item: TranslateResult) => {},
+  setSelectedTranslation: () => {},
 });
 
 function useInitalApp(): AppContextType {

@@ -17,9 +17,14 @@ export const LoginForm = ({ onSignedIn }: { onSignedIn?: () => void }) => {
   const { login, busy } = useUser();
 
   const onSubmit: SubmitHandler<LoginFormData> = async (data, event) => {
-    event && event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
+
     login(data).then(() => {
-      onSignedIn && onSignedIn();
+      if (onSignedIn) {
+        onSignedIn();
+      }
     });
   };
 
