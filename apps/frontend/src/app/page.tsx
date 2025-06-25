@@ -7,12 +7,28 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { createRef, useEffect } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 
 export default function Home() {
   const { isLoading, translations, deleteTranslation, isDeleting } =
     useTranslate();
+  const { user, selectedTranslation, setSelectedTranslation } = useApp();
+  const leftPanelRef = createRef<ImperativePanelHandle>();
 
-  const { selectedTranslation, setSelectedTranslation } = useApp();
+  useEffect(() => {
+    // If leftPanelRef has not mounted yet, ignore this call and exit
+    if (!leftPanelRef.current) {
+      return;
+    }
+
+    // If there is a user logged in, expand the left panel. Else, collapse it.
+    if (user) {
+      leftPanelRef.current?.expand();
+    } else {
+      leftPanelRef.current?.collapse();
+    }
+  }, [user]);
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -21,7 +37,8 @@ export default function Home() {
   return (
     <main className="flex flex-col h-screen">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel>
+        {/* Left panel displaying translation history */}
+        <ResizablePanel collapsible ref={leftPanelRef}>
           <div className="flex flex-col bg-gray-900  w-full h-full space-y-2 p-2">
             {translations.map((item) => (
               <TranslateCard
