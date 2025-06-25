@@ -2,6 +2,9 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { RegisterConfirmation, SignUpStateType } from "@/lib";
 import { useUser } from "@/hooks";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 /**
  * Renders the confirmation form for user email verification.
@@ -22,7 +25,7 @@ export const ConfirmSignUp = ({
     formState: { errors },
   } = useForm<RegisterConfirmation>();
 
-  const { confirmRegister } = useUser();
+  const { confirmRegister, busy } = useUser();
 
   const onSubmit: SubmitHandler<RegisterConfirmation> = async (data, event) => {
     event && event.preventDefault();
@@ -37,9 +40,10 @@ export const ConfirmSignUp = ({
   return (
     <form className="flex flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label htmlFor="email">Email:</label>
-        <input
+        <Label htmlFor="email">Email:</Label>
+        <Input
           id="email"
+          disabled={busy}
           className="bg-white"
           {...register("email", { required: true })}
         />
@@ -47,9 +51,10 @@ export const ConfirmSignUp = ({
       </div>
 
       <div className="my-1">
-        <label htmlFor="verificationCode">Verification code: </label>
-        <input
+        <Label htmlFor="verificationCode">Verification code: </Label>
+        <Input
           id="verificationCode"
+          disabled={busy}
           type="string"
           className="bg-white"
           {...register("verificationCode", { required: true })}
@@ -57,9 +62,7 @@ export const ConfirmSignUp = ({
         {errors.verificationCode && <span>Field is required</span>}
       </div>
 
-      <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
-        {"Confirm"}
-      </button>
+      <Button type="submit">Confirm</Button>
     </form>
   );
 };
