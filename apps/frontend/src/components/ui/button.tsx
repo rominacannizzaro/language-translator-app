@@ -50,6 +50,7 @@ function Button({
   return (
     <Comp
       data-slot="button"
+      style={{ caretColor: "transparent" }}
       contentEditable={false}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}

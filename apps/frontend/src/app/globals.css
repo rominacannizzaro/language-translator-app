@@ -7,6 +7,17 @@ body {
   background: #f3f4f6;
 }
 
+p,
+h1,
+span {
+  user-select: none;
+}
+
+label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

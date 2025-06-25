@@ -62,7 +62,9 @@ export const ConfirmSignUp = ({
         {errors.verificationCode && <span>Field is required</span>}
       </div>
 
-      <Button type="submit">Confirm</Button>
+      <Button type="submit" className="my-5">
+        Confirm
+      </Button>
     </form>
   );
 };
