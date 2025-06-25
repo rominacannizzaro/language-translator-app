@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/resizable";
 import { createRef, useEffect } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
+import { LoadingPage } from "@/components/ui/loading";
 
 export default function Home() {
   const { isLoading, translations, deleteTranslation, isDeleting } =
@@ -31,7 +32,7 @@ export default function Home() {
   }, [user]);
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <LoadingPage />;
   }
 
   return (
