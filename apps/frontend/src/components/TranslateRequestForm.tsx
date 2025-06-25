@@ -9,6 +9,18 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { useApp } from "./AppProvider";
+import { Combobox, ComboboxOptionType } from "./ui/combobox";
+import { Language, LANGUAGE_LIST } from "@/lib";
+
+const languageOptions: Array<ComboboxOptionType<Language>> = LANGUAGE_LIST.map(
+  (item) => {
+    return {
+      value: item.name,
+      label: item.name,
+      data: item,
+    };
+  }
+);
 
 export const TranslateRequestForm = () => {
   const { translate, isTranslating } = useTranslate();
@@ -51,21 +63,28 @@ export const TranslateRequestForm = () => {
 
       <div className="my-1">
         <Label htmlFor="sourceLang">Input language:</Label>
-        <Input
-          id="sourceLang"
-          className="bg-white"
-          {...register("sourceLang", { required: true })}
+        <Combobox
+          placeholder="Language"
+          options={languageOptions}
+          selected={languageOptions.find(
+            (i) => i.data.code === selectedTranslation?.sourceLang
+          )}
+          onSelect={(a) => setValue("sourceLang", a.data.code)}
         />
         {errors.sourceLang && <span>Field is required</span>}
       </div>
 
       <div className="my-1">
         <Label htmlFor="targetLang">Output language:</Label>
-        <Input
-          id="targetLang"
-          className="bg-white"
-          {...register("targetLang", { required: true })}
+        <Combobox
+          placeholder="Language"
+          options={languageOptions}
+          selected={languageOptions.find(
+            (i) => i.data.code === selectedTranslation?.targetLang
+          )}
+          onSelect={(a) => setValue("targetLang", a.data.code)}
         />
+
         {errors.targetLang && <span>Field is required</span>}
       </div>
 
