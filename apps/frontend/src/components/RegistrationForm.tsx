@@ -81,6 +81,11 @@ export const RegistrationForm = ({
         {errors.password2 && <span>Field is required</span>}
       </div>
 
+      <p className="text-xs text-gray-500 mt-1">
+        Password must include min. 8 characters, at least one uppercase letter,
+        one lowercase letter, one number, and one symbol character (e.g.: !).
+      </p>
+
       <Button contentEditable={false} type="submit" className="my-3">
         Register
       </Button>
