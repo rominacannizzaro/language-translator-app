@@ -67,7 +67,7 @@ export class TranslationService extends Construct {
     // Lambda Layer construct
     const utilsLambdaLayer = new lambda.LayerVersion(this, "utilsLambdaLayer", {
       code: lambda.Code.fromAsset(utilsLambdaLayerPath),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
+      compatibleRuntimes: [lambda.Runtime.NODEJS_22_X],
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 

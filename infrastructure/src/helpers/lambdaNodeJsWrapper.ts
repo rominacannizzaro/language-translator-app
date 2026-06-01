@@ -43,7 +43,7 @@ export const createNodeJsLambda = (
   return new lambdaNodeJs.NodejsFunction(scope, lambdaName, {
     entry: lambdaPath,
     handler,
-    runtime: lambda.Runtime.NODEJS_20_X,
+    runtime: lambda.Runtime.NODEJS_22_X,
     initialPolicy, // grant lambda the permissions defined in these policies to interact w/Amazon Translate and DynamoDB
     layers: lambdaLayers,
     environment,
